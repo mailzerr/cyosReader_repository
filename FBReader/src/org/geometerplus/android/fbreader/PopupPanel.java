@@ -21,12 +21,11 @@ package org.geometerplus.android.fbreader;
 
 import android.app.Activity;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import org.geometerplus.zlibrary.core.application.ZLApplication;
-
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
-
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 
 abstract class PopupPanel extends ZLApplication.PopupPanel {
