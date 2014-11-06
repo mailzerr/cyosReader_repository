@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"> 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#5d828b"
+        android:orientation="vertical"  >
+
+        <fragment
+            android:id="@+id/structureElements"
+            android:name="org.geometerplus.android.fbreader.StructureElementsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="#5d828b"
+            />
+
+        <org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
+            android:id="@+id/main_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fadeScrollbars="false"
+            android:focusable="true"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+</RelativeLayout>

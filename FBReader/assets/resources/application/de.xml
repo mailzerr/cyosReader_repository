@@ -232,9 +232,9 @@
 		<node name="cannotCreateFile" value="Die Datei %s kann nicht erstellt werden"/>
 	</node>
 	<node name="tocView">
-		<node name="expandTree" value="Inhaltsverzeichnis erweitern"/>
-		<node name="collapseTree" value="Inhaltsverzeichnis reduzieren"/>
-		<node name="readText" value="Text lesen"/>
+		<node name="expandTree" value="Strukturelemente des Kapitels anzeigen"/>
+		<node name="collapseTree" value="Strukturelemente des Kapitels verbergen"/>
+		<node name="readText" value="Kapitel von Anfang an lesen"/>
 	</node>
 	<node name="bookmarksView">
 		<node name="thisBook" value="Dieses Buch"/>

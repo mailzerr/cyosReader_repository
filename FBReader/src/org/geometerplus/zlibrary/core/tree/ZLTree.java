@@ -23,9 +23,9 @@ import java.util.*;
 
 public abstract class ZLTree<T extends ZLTree<T>> implements Iterable<T> {
 	private int mySize = 1;
-	public final T Parent;
-	public final int Level;
-	private volatile List<T> mySubtrees;
+	public T Parent;
+	public int Level;
+	public volatile List<T> mySubtrees;
 
 	protected ZLTree() {
 		this(null);

@@ -55,6 +55,10 @@ public abstract class ZLApplication {
 		}
 	}
 
+	public ZLApplicationWindow getMyWindow() {
+		return myWindow;
+	}
+
 	public final ZLView getCurrentView() {
 		return myView;
 	}

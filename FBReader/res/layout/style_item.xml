@@ -38,4 +38,15 @@
 		android:focusable="false"
 		android:focusableInTouchMode="false"
 	/>
+	<!-- 
+	<EditText
+	    android:id="@+id/structElemName"
+	    android:layout_width="wrap_content"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="1"
+	    android:ems="10" >
+
+	    <requestFocus />
+	</EditText>
+	 -->
 </LinearLayout>

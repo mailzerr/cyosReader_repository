@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <!-- android:id/list und NICHT @id+/blabla, weil diese ListView  zur Laufzeit aufgesucht wird -->
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left|center_vertical"
+        android:longClickable="true"
+        android:layout_weight="10" >
+    </ListView>
+
+    <!-- special id for TextView: wird angezeigt, wenn ListView oben keine Elemente drin hat -->
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:text="EPUB-Error: kein Inhaltsverzeichnis vorhanden!" 
+        android:layout_weight="5"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:src="@drawable/afc_button_navi_left" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:layout_weight="0.45" />
+
+        <ImageButton
+            android:id="@+id/imageButton2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:src="@drawable/afc_button_navi_right" />
+    </LinearLayout>
+
+</LinearLayout>

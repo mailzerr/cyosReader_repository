@@ -25,17 +25,29 @@ import org.geometerplus.zlibrary.core.application.*;
 import org.geometerplus.zlibrary.core.drm.FileEncryptionInfo;
 import org.geometerplus.zlibrary.core.drm.EncryptionMethod;
 import org.geometerplus.zlibrary.core.util.*;
-
 import org.geometerplus.zlibrary.text.hyphenation.ZLTextHyphenator;
 import org.geometerplus.zlibrary.text.model.ZLTextModel;
 import org.geometerplus.zlibrary.text.view.*;
-
+import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
+import org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget;
+import org.geometerplus.android.fbreader.FBReader;
+import org.geometerplus.android.fbreader.FBReaderApplication;
+import org.geometerplus.android.fbreader.FBUtil;
+import org.geometerplus.android.fbreader.StructureElementsFragment;
+import org.geometerplus.android.fbreader.api.FBReaderIntents;
 import org.geometerplus.fbreader.book.*;
 import org.geometerplus.fbreader.bookmodel.*;
 import org.geometerplus.fbreader.fbreader.options.*;
 import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
 import org.geometerplus.fbreader.formats.FormatPlugin;
 import org.geometerplus.fbreader.network.sync.SyncData;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.FragmentManager;
+import android.content.Context;
+import android.view.View;
 
 public final class FBReaderApp extends ZLApplication {
 	public interface ExternalFileOpener {
@@ -234,11 +246,10 @@ public final class FBReaderApp extends ZLApplication {
 		BookTextView.clearCaches();
 		FootnoteView.clearCaches();
 	}
-
+	
 	public Bookmark addSelectionBookmark() {
 		final FBView fbView = getTextView();
 		final String text = fbView.getSelectedText();
-
 		final Bookmark bookmark = new Bookmark(
 			Model.Book,
 			fbView.getModel().getId(),
@@ -248,8 +259,16 @@ public final class FBReaderApp extends ZLApplication {
 			true
 		);
 		Collection.saveBookmark(bookmark);
+		
+//		// TODO Stelle um die Daten zum Fragment zu schicken!!
+//		// zuerst soll ich einen Zugriff auf meine Activity bekommen.
+//		//geschaaaft! hier:
+//		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+//		Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
+//		StructureElementsFragment myFragment = (StructureElementsFragment) act.getFragmentManager().findFragmentById(R.id.structureElements);
+//		myFragment.saveStructureElement(bookmark, "Zerrtest");
+//		//end
 		fbView.clearSelection();
-
 		return bookmark;
 	}
 
@@ -650,6 +669,7 @@ public final class FBReaderApp extends ZLApplication {
 		}
 		return treeToSelect;
 	}
+
 
 	public void onBookUpdated(Book book) {
 		if (Model == null || Model.Book == null || !Model.Book.equals(book)) {

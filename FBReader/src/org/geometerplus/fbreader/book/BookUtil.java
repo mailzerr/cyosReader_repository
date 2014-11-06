@@ -79,9 +79,7 @@ public abstract class BookUtil {
 			return file;
 		}
 
-		file = ZLResourceFile.createResourceFile(
-			"data/help/MiniHelp." + locale.getLanguage() + ".fb2"
-		);
+		file = ZLResourceFile.createResourceFile("data/help/MiniHelp.de.epub");
 		if (file.exists()) {
 			return file;
 		}

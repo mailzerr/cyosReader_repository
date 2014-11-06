@@ -22,24 +22,25 @@ package org.geometerplus.android.fbreader.style;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.*;
+import android.text.Editable;
 import android.view.*;
-
 import yuku.ambilwarna.widget.AmbilWarnaPrefWidgetView;
 
+import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.util.ZLColor;
 import org.geometerplus.zlibrary.ui.android.R;
 import org.geometerplus.zlibrary.ui.android.util.ZLAndroidColorUtil;
-
 import org.geometerplus.fbreader.book.*;
-
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.android.fbreader.StructureElementsFragment;
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
 import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
-
 import org.geometerplus.android.util.ViewUtil;
 
 public class StyleListActivity extends ListActivity implements IBookCollection.Listener {
@@ -184,6 +185,22 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 					if (style != null) {
 						myBookmark.setStyleId(style.Id);
 						myCollection.saveBookmark(myBookmark);
+						
+						// TODO Stelle um die Daten zum Fragment zu schicken!!
+						// zuerst soll ich einen Zugriff auf meine Activity bekommen.
+						//geschaaaft! hier:
+						
+						
+						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
+						StructureElementsFragment myFragment = (StructureElementsFragment) act.getFragmentManager().findFragmentById(R.id.structureElements);
+						
+						// Einlesen des Structurelementnamens:
+//						EditText structElemNameField = (EditText) findViewById(R.id.structElemName);
+//						String structElemName = structElemNameField.getText().toString(); 
+						myFragment.saveStructureElement(myBookmark, "TESTTEST");
+						
+						//end
 					} else {
 						myCollection.deleteBookmark(myBookmark);
 					}

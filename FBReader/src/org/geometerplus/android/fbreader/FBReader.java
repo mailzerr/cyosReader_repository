@@ -315,7 +315,7 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		setStatusBarVisibility(true);
+		setStatusBarVisibility(false);
 		setupMenu(menu);
 
 		return super.onPrepareOptionsMenu(menu);
@@ -1033,4 +1033,10 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 			myFBReaderApp.useSyncInfo(myResumeTimestamp + 10 * 1000 > System.currentTimeMillis());
 		}
 	};
+	
+	public void sendBookmarkToFragment(Bookmark b){
+		StructureElementsFragment myFragment = (StructureElementsFragment) 
+				getFragmentManager().findFragmentById(R.id.structureElements);
+		return;
+	}
 }

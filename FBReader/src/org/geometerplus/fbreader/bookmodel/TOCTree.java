@@ -34,6 +34,10 @@ public class TOCTree extends ZLTree<TOCTree> {
 	public TOCTree(TOCTree parent) {
 		super(parent);
 	}
+	
+	public TOCTree(TOCTree parent, int pos) {
+		super(parent, pos);
+	}
 
 	public final String getText() {
 		return myText;
@@ -91,7 +95,7 @@ public class TOCTree extends ZLTree<TOCTree> {
 	}
 
 	public static class Reference {
-		public final int ParagraphIndex;
+		public int ParagraphIndex;
 		public final ZLTextModel Model;
 
 		public Reference(final int paragraphIndex, final ZLTextModel model) {
