@@ -190,7 +190,6 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 						// zuerst soll ich einen Zugriff auf meine Activity bekommen.
 						//geschaaaft! hier:
 						
-						
 						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
 						StructureElementsFragment myFragment = (StructureElementsFragment) act.getFragmentManager().findFragmentById(R.id.structureElements);

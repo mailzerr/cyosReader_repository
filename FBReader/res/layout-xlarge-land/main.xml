@@ -9,16 +9,22 @@
         android:id="@+id/root_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         android:background="#5d828b"
-        android:orientation="horizontal" >
-
-        <fragment
-            android:id="@+id/structureElements"
-            android:name="org.geometerplus.android.fbreader.StructureElementsFragment"
+        android:orientation="horizontal">
+	
+        <FrameLayout
+            android:id="@+id/fragment_container"
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:background="#5d828b"
-            />
+            android:layout_height="match_parent" >
+
+            <fragment
+                android:id="@+id/structureElements"
+                android:name="org.geometerplus.android.fbreader.StructureElementsFragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#5d828b" />
+        </FrameLayout>
 
         <org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
             android:id="@+id/main_view"

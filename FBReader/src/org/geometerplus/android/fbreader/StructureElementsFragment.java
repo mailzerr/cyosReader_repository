@@ -3,37 +3,30 @@ package org.geometerplus.android.fbreader;
 import java.util.List;
 
 import org.geometerplus.android.util.ViewUtil;
-import org.geometerplus.fbreader.book.Book;
 import org.geometerplus.fbreader.book.Bookmark;
-import org.geometerplus.fbreader.book.BookmarkQuery;
-import org.geometerplus.fbreader.bookmodel.BookModel;
-import org.geometerplus.fbreader.bookmodel.BookReadingException;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
-import org.geometerplus.fbreader.fbreader.FBView;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.tree.ZLTree;
-import org.geometerplus.zlibrary.text.model.ZLTextModel;
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.zlibrary.ui.android.R;
 
-import android.app.Activity;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.app.Fragment;
 import android.app.ListFragment;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.ViewPropertyAnimator;
+import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.ImageButton;
 
 public class StructureElementsFragment extends ListFragment implements AdapterView.OnItemClickListener {
 	private TOCAdapter myAdapter;
@@ -145,7 +138,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		// und das Padding auf der gleichen Ebene wie das Strukturelement
 		return;
 	}
-	
+
 
 
 	@Override
@@ -155,7 +148,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
-			// Code TOCActiity.java start
+			// Code TOCActivity.java start
 			final TOCTree root = fbreader.Model.TOCTree;
 			myAdapter = new TOCAdapter(root);   // TODO set onItemLongClickListener, evtl. auch mOnScrollListener, mOnHierarchyChangeListener
 			final ZLTextWordCursor cursor = fbreader.BookTextView.getStartCursor();
@@ -168,11 +161,9 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			mySelectedItem = treeToSelect;
 
 			// HIER BEGINNT DIE TESTPHASE FÜR STRUKTURELEMENTE
-			// fbreader.BookTextView.gotoPosition(paragraphIndex, wordIndex, charIndex);
 /*
 			//alle bookmarks holen:
 			final List<Bookmark> bookmarks = fbreader.Collection.bookmarks(new BookmarkQuery(fbreader.Model.Book, false, 10));
-			
 			if (fbreader.Model != null) {
 				if (fbreader.Model.TOCTree.subtrees() != null) { // Kapitelüberschriften sind bereits eingelesen
 					if (fbreader.Model.TOCTree.subtrees().get(0).subtrees() != null) {
@@ -197,8 +188,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 								}
 							}
 						}
-						
-						
 //						TOCTree testTOC = new TOCTree(fbreader.Model.TOCTree.subtrees().get(0));
 //						String onWidgetSelectedText = fbreader.getTextView().getSelectedText();
 //						testTOC.setText(onWidgetSelectedText);
@@ -206,12 +195,165 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					}
 				}
 			}
-			*/
-			/* *****
-			//BUTTON: 
-			Button btnKleiner =(Button) getActivity().findViewById(R.id.button1); 
+*/
+
+			//start of buttons handling 
+
+			final int animDuration = 500;
+			final int layoutChangeValue = 100;
 			
+			ImageButton btnIncrease = (ImageButton) getActivity().findViewById(R.id.increase);
+			btnIncrease.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					final View view = getActivity().findViewById(R.id.fragment_container);
+					int newWidth = view.getWidth();
+					int newHeight = view.getHeight();
+					
+					//set the color fo decrease button to default
+					ImageButton imgButtonDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
+					imgButtonDecrease.setImageResource(R.drawable.decrease_land_default);
+					
+					ImageButton imgButtonIncrease = (ImageButton) getActivity().findViewById(R.id.increase);
+					if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						//prüfen, ob der Strukturbereich nicht zu gross ist
+						if(newWidth > 600) {
+							imgButtonIncrease.setImageResource(R.drawable.increase_land_disabled);
+							return;
+						}
+						else {
+							imgButtonIncrease.setImageResource(R.drawable.increase_land_default);
+						}
+						// start anim with Value Animator:
+							ValueAnimator anim = ValueAnimator.ofInt(newWidth, newWidth + layoutChangeValue);
+						    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						        @Override
+						        //onAnimationUpdate informiert über das Auftreten eines anderen Frames in Animation
+						        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+						            int val = (Integer) valueAnimator.getAnimatedValue();
+						            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+						            layoutParams.width = val;
+						            view.setLayoutParams(layoutParams);
+						        }
+						    });
+						    anim.setDuration(animDuration);
+						    anim.start();
+						// anim end
+					}
+					else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+						//prüfen, ob der Strukturbereich nicht zu gross wird
+						if(newHeight > 600) {
+							imgButtonIncrease.setImageResource(R.drawable.increase_port_disabled);
+							return;
+						}
+						else {
+							imgButtonDecrease.setImageResource(R.drawable.increase_port_default);
+						}
+						
+						// start anim with Value Animator:
+						ValueAnimator anim = ValueAnimator.ofInt(view.getHeight(), view.getHeight() + layoutChangeValue);
+						    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						        @Override
+						        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+						            int val = (Integer) valueAnimator.getAnimatedValue();
+						            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+						            layoutParams.height = val;
+						            view.setLayoutParams(layoutParams);
+						        }
+						    });
+						    anim.setDuration(animDuration);
+						    anim.start();
+						//anim end
+					}
+				}
+			});
+			
+			
+			ImageButton btnDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
+			btnDecrease.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+//					final Fragment frag = getActivity().getFragmentManager().findFragmentById(R.id.structureElements);
+//					final View view = frag.getView();
+					final View view = getActivity().findViewById(R.id.fragment_container);
+					int mWidth = view.getWidth();
+					int mHeight = view.getHeight();
+
+					//set the color of increase button to default
+					ImageButton imgButtonIncrease = (ImageButton) getActivity().findViewById(R.id.increase);
+					imgButtonIncrease.setImageResource(R.drawable.increase_land_default);
+					
+					ImageButton imgButtonDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
+					
+					if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						//prüfen, ob der Strukturbereich gross genug ist
+						if(mWidth < 250) {
+							imgButtonDecrease.setImageResource(R.drawable.decrease_land_disabled);
+							return;
+						}
+						else {
+							imgButtonDecrease.setImageResource(R.drawable.decrease_land_default);
+						}
+						
+						// start anim with Value Animator:
+							ValueAnimator anim = ValueAnimator.ofInt(mWidth, mWidth - layoutChangeValue);
+						    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						        @Override
+						        //onAnimationUpdate informiert über das Auftreten eines anderen Frames in Animation
+						        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+						            int val = (Integer) valueAnimator.getAnimatedValue();
+						            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+						            layoutParams.width = val;
+						            view.setLayoutParams(layoutParams);
+						        }
+						    });
+						    anim.setDuration(animDuration);
+						    anim.start();
+						//anim end
+					 /*
+					    ResizeWidthAnimation anim = new ResizeWidthAnimation(view, mWidth - layoutChangeValue);
+					    anim.setDuration(animDuration);
+					    view.startAnimation(anim);
+					    */
+					}
+					else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+						//prüfen, ob der Strukturbereich gross genug ist
+						
+						if (mHeight < 250) {
+							imgButtonDecrease.setImageResource(R.drawable.decrease_port_disabled);
+							return;
+						}
+						else {
+							imgButtonDecrease.setImageResource(R.drawable.decrease_port_default);
+						}
+						
+						// start anim with Value Animator:
+						ValueAnimator anim = ValueAnimator.ofInt(view.getHeight(), view.getHeight() - layoutChangeValue);
+						    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						        @Override
+						        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+						            int val = (Integer) valueAnimator.getAnimatedValue();
+						            ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+						            layoutParams.height = val;
+						            view.setLayoutParams(layoutParams);
+						        }
+						    });
+						    anim.setDuration(animDuration);
+						    anim.start();
+						//anim end
+					}
+				}
+			});
+			
+			// end of buttons handling
+			
+
+//	        frag.getFragmentManager().saveFragmentInstanceState(f); WICHTIG FÜR ERSETZEN DER FRAGMENTE
+			
+			/*
+			 *  
 			btnKleiner.setOnClickListener(new View.OnClickListener() {
+			
 				//http://stackoverflow.com/questions/12423635/how-to-pass-data-from-one-fragment-to-other-in-android
 				@Override
 				public void onClick(View v) {

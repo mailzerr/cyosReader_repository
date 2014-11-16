@@ -1099,7 +1099,7 @@ public abstract class ZLTextView extends ZLTextViewBase {
 			} else if (element instanceof ZLTextWord) {
 				wordOccurred = true;
 				isVisible = true;
-			} else if (element instanceof ZLTextImageElement) {
+			} else if (element instanceof ZLTextImageElement) {//hier statt unteren zwei Zeilen applyStyleChangeElement(element); ausprobieren??
 				wordOccurred = true;
 				isVisible = true;
 			} else if (element instanceof ZLTextVideoElement) {

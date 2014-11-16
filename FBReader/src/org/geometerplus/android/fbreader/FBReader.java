@@ -26,6 +26,8 @@ import java.util.*;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.*;
 import android.graphics.Color;
@@ -103,6 +105,12 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 
 	private Intent myCancelIntent = null;
 	private Intent myOpenBookIntent = null;
+	
+	private FragmentManager myFragmentManager;
+
+	public FragmentManager getMyFragmentManager() {
+		return myFragmentManager;
+	}
 
 	private static final String PLUGIN_ACTION_PREFIX = "___";
 	private final List<PluginApi.ActionInfo> myPluginActions =
@@ -201,7 +209,23 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(this));
-
+		
+		myFragmentManager = getFragmentManager();
+		
+//		 new stuff 
+		FragmentTransaction transaction = myFragmentManager.beginTransaction();
+		StructureElementsFragment structElFrag = new StructureElementsFragment();
+		
+//		clear backstack:
+				if (myFragmentManager.getBackStackEntryCount() > 0){
+					myFragmentManager.popBackStack();
+				}
+		// ACHTUNG, wenn ich R.id.fragment_container einkommentiere, dann verschwinden die Animationen!!
+		transaction.add(/*R.id.fragment_container,*/ structElFrag, "StructureElements");
+		transaction.addToBackStack("StructureElementsFragment");
+		transaction.commit();
+		// end new stuff
+		
 		bindService(
 			new Intent(this, DataService.class),
 			DataConnection,
@@ -274,9 +298,15 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		myFBReaderApp.addAction(ActionCode.SELECTION_HIDE_PANEL, new SelectionHidePanelAction(this, myFBReaderApp));
 		myFBReaderApp.addAction(ActionCode.SELECTION_COPY_TO_CLIPBOARD, new SelectionCopyAction(this, myFBReaderApp));
 		myFBReaderApp.addAction(ActionCode.SELECTION_SHARE, new SelectionShareAction(this, myFBReaderApp));
-		myFBReaderApp.addAction(ActionCode.SELECTION_TRANSLATE, new SelectionTranslateAction(this, myFBReaderApp));
+		
+		
+		//add new actions
+		myFBReaderApp.addAction(ActionCode.SELECTION_TRANSLATE, new SelectionWebSearchAction(this, myFBReaderApp, ActionCode.SELECTION_TRANSLATE));
+		myFBReaderApp.addAction(ActionCode.SELECTION_GOOGLE, new SelectionWebSearchAction(this, myFBReaderApp, ActionCode.SELECTION_GOOGLE));
+		myFBReaderApp.addAction(ActionCode.SELECTION_WIKIPEDIA, new SelectionWebSearchAction(this, myFBReaderApp, ActionCode.SELECTION_WIKIPEDIA));
 		myFBReaderApp.addAction(ActionCode.SELECTION_BOOKMARK, new SelectionBookmarkAction(this, myFBReaderApp));
-
+		//end new actions
+		
 		myFBReaderApp.addAction(ActionCode.PROCESS_HYPERLINK, new ProcessHyperlinkAction(this, myFBReaderApp));
 		myFBReaderApp.addAction(ActionCode.OPEN_VIDEO, new OpenVideoAction(this, myFBReaderApp));
 
