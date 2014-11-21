@@ -270,14 +270,6 @@ public final class FBReaderApp extends ZLApplication {
 		);
 		Collection.saveBookmark(bookmark);
 		
-//		// TODO Stelle um die Daten zum Fragment zu schicken!!
-//		// zuerst soll ich einen Zugriff auf meine Activity bekommen.
-//		//geschaaaft! hier:
-//		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-//		Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
-//		StructureElementsFragment myFragment = (StructureElementsFragment) act.getFragmentManager().findFragmentById(R.id.structureElements);
-//		myFragment.saveStructureElement(bookmark, "Zerrtest");
-//		//end
 		fbView.clearSelection();
 		return bookmark;
 	}

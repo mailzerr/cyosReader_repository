@@ -1,60 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-   	<WebView 
-   	    android:id="@+id/webSearch"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="0dp"
-   	    android:layout_weight="13"/>
- 
-   		<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal" 
-        android:layout_gravity="bottom"
-        >
+    android:layout_height="match_parent">
 
-		<ImageButton
-		    android:id="@+id/decrease"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="left|center_horizontal"
-		    android:background="@android:color/transparent"
-		    android:src="@drawable/decrease_land" />
+    <WebView
+        android:id="@+id/webSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+    	android:layout_toLeftOf="@id/structElButtons"   
+    	android:background="@drawable/uni_hagen_logo" 
+	 />
 
-        <!-- Platzhalter, damit kleiner-groesser buttons auseinander am Rand der View stehen -->
+    <RelativeLayout
+        android:id="@+id/structElButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="#5d828b" >
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="bottom"
-            android:layout_weight="1" />
-        
         <ImageButton
-		    android:id="@+id/close_websearch"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="center"
-		    android:background="@android:color/transparent"
-		    android:src="@drawable/websearch_close" />
-        
-		<View
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="bottom"
-            android:layout_weight="1" />
-            
-        <ImageButton
-            android:id="@+id/increase"
+            android:id="@+id/decreasewebsearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center_horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
             android:background="@android:color/transparent"
-            android:src="@drawable/increase_land" />
+            android:src="@drawable/decrease_port" />
 
-    </LinearLayout>
-   	
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/close_websearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/websearch_close" />
+
+        <ImageButton
+            android:id="@+id/increasewebsearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/increase_port" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -10,20 +10,22 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
-public class WebSearchFragment extends Fragment implements OnClickListener {
+public class ImageShowFragment extends Fragment implements OnClickListener {
 
-	private String mySearchTerm;
-	private String myUserChoice;
+	Bitmap myBitmap;
+	ImageView myImageView;
+	String myUrl;
+	
 	public WebView myWebView;
 
 	final int animDuration = 500;
@@ -33,96 +35,46 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 	ImageButton myBtnDecrease;
 	ImageButton myBtnClose; 
 	
-	public WebSearchFragment(String searchTerm, String userChoice) {
+	public ImageShowFragment(String url) {
 		super();
-		this.mySearchTerm = searchTerm;
-		this.myUserChoice = userChoice;
-	}
-
-	public WebSearchFragment() {
-		super();
-		myUserChoice = "Android";
-		mySearchTerm = "http://de.wikipedia.org/wiki/";
-	}
-
-
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-	}
-
-	@Override
-	@JavascriptInterface
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View webSearchView = inflater.inflate(R.layout.web_search_fragment, container, false);
-		
-		
-		if (savedInstanceState != null) // TODO
-		{// wird bei Änderung der Orientierung ausgeführt
-			mySearchTerm = savedInstanceState.getString("mySearchTerm");
-			myUserChoice = savedInstanceState.getString("myUserChoice");
-		}
-		
-		myWebView = (WebView) webSearchView.findViewById(R.id.webSearch);
-		myWebView.getSettings().setJavaScriptEnabled(true);
-		myWebView.setWebViewClient(new WebViewClient());
-		// dictionary
-		if (myUserChoice.compareTo("selectionTranslate") == 0) {
-			myWebView.loadUrl("http://www.dict.cc/?s=" + mySearchTerm);
-			return webSearchView;
-		} else if (myUserChoice.compareTo("selectionWikipedia") == 0) {
-			myWebView.loadUrl("http://de.wikipedia.org/wiki/" + mySearchTerm);
-			return webSearchView;
-		} else if (myUserChoice.compareTo("selectionGoogle") == 0) {
-			myWebView.loadUrl("http://www.google.com/search?q=" + mySearchTerm);
-			return webSearchView;
-		} else {
-			myWebView.setWebViewClient(new AllowWebBrowsingClient());
-			// http://www.google.com/search?q=Tustumena
-			myWebView.loadUrl("http://www.google.com/search?q=" + mySearchTerm);
-		}
-		return webSearchView;
+		myUrl = url;
 	}
 	
-		private class AllowWebBrowsingClient extends WebViewClient {
-			// damit man im WebFragment weitere Links anklicken kann
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
-				return true;
-			}
+	public ImageShowFragment(Bitmap bitmap) {
+		super();
+		myBitmap = bitmap;
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putString("myUserChoice", myUserChoice);
-		outState.putString("mySearchTerm", mySearchTerm);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View myView = inflater.inflate(R.layout.img_show_fragment, container, false);
+		myImageView = (ImageView) myView.findViewById(R.id.myImage);
+		myImageView.setImageBitmap(myBitmap);
+		return myView;
 	}
 
 	@Override
 	public void onClick(View v) {
-		ImageButton btnIncrease = (ImageButton) getActivity().findViewById(R.id.increasewebsearch);
-		ImageButton btnDecrease = (ImageButton) getActivity().findViewById(R.id.decreasewebsearch);
-		if (v.getId() == R.id.close_websearch) {
+		ImageButton btnIncrease = (ImageButton) getActivity().findViewById(R.id.increaseshowimage);
+		ImageButton btnDecrease = (ImageButton) getActivity().findViewById(R.id.decreaseshowimage);
+		if (v.getId() == R.id.close_showimage) {
 			
 			final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 			Activity act = (Activity) fbreader.getMyWindow();
 			FragmentManager fm = act.getFragmentManager();
 			FragmentTransaction transaction = fm.beginTransaction();
 			Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag");
-			// entferne das geöffnete Fragment bis auf den Strukturbereich:
-			// TODO: überprüfen, was passiert, wenn es mehrere Fragmente auf dem
-			// Stack sind
+
 			if (fm.getBackStackEntryCount() > 1) {
 				fm.popBackStack();
 			}
-			Fragment webFragment = fm.findFragmentByTag("websearch");
-			transaction.remove(webFragment);
+			
+			Fragment imgFragment = fm.findFragmentByTag("ImageFragmentTag");
+			transaction.remove(imgFragment);
 			transaction.attach(StructElFrag); // show strElFrag:
 			transaction.commit();
 		}
-		if (v.getId() == R.id.increasewebsearch) {
+		if (v.getId() == R.id.increaseshowimage) {
 			final View view = getActivity().findViewById(R.id.fragment_container);
 			int newWidth = view.getWidth();
 			int newHeight = view.getHeight();
@@ -182,7 +134,7 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 			}
 		}
 		
-		if (v.getId() == R.id.decreasewebsearch) {
+		if (v.getId() == R.id.decreaseshowimage) {
 			final View view = getActivity().findViewById(R.id.fragment_container);
 			int mWidth = view.getWidth();
 			int mHeight = view.getHeight();
@@ -252,11 +204,11 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onResume() {
 		super.onResume();
-		WebSearchFragment webFrag = (WebSearchFragment) getActivity().getFragmentManager().findFragmentByTag("websearch"); 
+		ImageShowFragment webFrag = (ImageShowFragment) getActivity().getFragmentManager().findFragmentByTag("ImageFragmentTag"); 
 		if(webFrag != null){
-			myBtnIncrease = (ImageButton) getActivity().findViewById(R.id.increasewebsearch);
-			myBtnDecrease = (ImageButton) getActivity().findViewById(R.id.decreasewebsearch);
-			myBtnClose    = (ImageButton) getActivity().findViewById(R.id.close_websearch);
+			myBtnIncrease = (ImageButton) getActivity().findViewById(R.id.increaseshowimage);
+			myBtnDecrease = (ImageButton) getActivity().findViewById(R.id.decreaseshowimage);
+			myBtnClose    = (ImageButton) getActivity().findViewById(R.id.close_showimage);
 			
 			myBtnIncrease.setOnClickListener(this);
 			myBtnDecrease.setOnClickListener(this);

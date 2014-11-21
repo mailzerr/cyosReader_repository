@@ -19,20 +19,38 @@
 
 package org.geometerplus.android.fbreader;
 
-import android.content.Intent;
-import android.content.ActivityNotFoundException;
-import android.net.Uri;
+import java.io.File;
 
-import org.geometerplus.zlibrary.core.network.QuietNetworkContext;
-import org.geometerplus.zlibrary.text.view.*;
-
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-import org.geometerplus.fbreader.bookmodel.FBHyperlinkType;
-import org.geometerplus.fbreader.network.NetworkLibrary;
-
+import org.geometerplus.android.fbreader.image.ImageViewActivity;
 import org.geometerplus.android.fbreader.network.BookDownloader;
 import org.geometerplus.android.fbreader.network.BookDownloaderService;
-import org.geometerplus.android.fbreader.image.ImageViewActivity;
+import org.geometerplus.fbreader.bookmodel.FBHyperlinkType;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.fbreader.network.NetworkLibrary;
+import org.geometerplus.zlibrary.core.application.ZLApplication;
+import org.geometerplus.zlibrary.core.image.ZLFileImage;
+import org.geometerplus.zlibrary.core.image.ZLImageData;
+import org.geometerplus.zlibrary.core.image.ZLImageManager;
+import org.geometerplus.zlibrary.core.network.QuietNetworkContext;
+import org.geometerplus.zlibrary.core.view.ZLPaintContext;
+import org.geometerplus.zlibrary.text.view.ZLTextHyperlink;
+import org.geometerplus.zlibrary.text.view.ZLTextHyperlinkRegionSoul;
+import org.geometerplus.zlibrary.text.view.ZLTextImageRegionSoul;
+import org.geometerplus.zlibrary.text.view.ZLTextRegion;
+import org.geometerplus.zlibrary.text.view.ZLTextWordRegionSoul;
+import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
+
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Environment;
 
 class ProcessHyperlinkAction extends FBAndroidAction {
 	ProcessHyperlinkAction(FBReader baseActivity, FBReaderApp fbreader) {
@@ -74,11 +92,38 @@ class ProcessHyperlinkAction extends FBAndroidAction {
 					final Intent intent = new Intent();
 					intent.setClass(BaseActivity, ImageViewActivity.class);
 					intent.setData(Uri.parse(url));
-					intent.putExtra(
-						ImageViewActivity.BACKGROUND_COLOR_KEY,
-						Reader.ImageOptions.ImageViewBackground.getValue().intValue()
-					);
-					OrientationUtil.startActivity(BaseActivity, intent);
+//					new stuff
+//					ImageShowFragment myImgFragment = new ImageShowFragment("file:///sdcard/epub/testbuch/imgname.png"); //funktioniert
+					final Uri uri = Uri.parse(url);
+					final ZLFileImage image = ZLFileImage.byUrlPath(uri.getPath());
+					final ZLImageData imageData = ZLImageManager.Instance().getImageData(image);
+					Bitmap myBitmap = ((ZLAndroidImageData)imageData).getFullSizeBitmap();
+
+					ImageShowFragment myImgFragment = new ImageShowFragment(myBitmap);
+					
+					FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+					Activity act = (Activity) fbreader.getMyWindow(); 
+					FragmentManager fm = act.getFragmentManager(); // Referenz auf meinen einzigen FragmentManager holen
+					FragmentTransaction transaction = fm.beginTransaction();
+
+					Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag");
+					transaction.detach(StructElFrag); // hide the structure elements fragment 
+					if (fm.getBackStackEntryCount() > 1) {
+						fm.popBackStack();
+					}
+					
+					transaction.add(R.id.fragment_container, myImgFragment, "ImageFragmentTag");
+					transaction.addToBackStack("ImageFragmentTag");
+					transaction.commit();
+					return;
+					//end new stuff
+					
+					//löschen:
+//					intent.putExtra(
+//						ImageViewActivity.BACKGROUND_COLOR_KEY,
+//						Reader.ImageOptions.ImageViewBackground.getValue().intValue()
+//					);
+//					OrientationUtil.startActivity(BaseActivity, intent);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

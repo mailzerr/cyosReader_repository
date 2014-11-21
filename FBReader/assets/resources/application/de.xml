@@ -257,13 +257,13 @@
 		<node name="forward" value="Vorwärts"/>
 		<node name="close" value="FBReader schließen"/>
 	</node>
-	<node name="style" value="Stil %s"/>
+	<node name="style" value="Strukturelement %s"/>
 	<node name="highlightingStyleMenu">
-		<node name="editStyle" value="Stil bearbeiten…"/>
-		<node name="deleteBookmark" value="Lesezeichen löschen"/>
+		<node name="editStyle" value="Strukturelement bearbeiten…"/>
+		<node name="deleteBookmark" value="Strukturelement löschen"/>
 	</node>
 	<node name="editStyle">
-		<node name="name" value="Stilname"/>
+		<node name="name" value="Name"/>
 		<node name="invisible" value="Unsichtbar">
 			<node name="summaryOn" value="Lesezeichen nicht hervorheben"/>
 			<node name="summaryOff" value="Lesezeichen hervorheben"/>

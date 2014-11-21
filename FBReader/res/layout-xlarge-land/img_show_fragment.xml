@@ -4,11 +4,10 @@
     android:layout_height="match_parent" 
     >
 
-    <WebView
-        android:id="@+id/webSearch"
+    <ImageView
+        android:id="@+id/myImage"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_above="@id/structElButtons"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
@@ -23,7 +22,7 @@
         android:background="#5d828b" >
 
         <ImageButton
-            android:id="@+id/decreasewebsearch"
+            android:id="@+id/decreaseshowimage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -32,7 +31,7 @@
             android:src="@drawable/decrease_land" />
 
         <ImageButton
-            android:id="@+id/close_websearch"
+            android:id="@+id/close_showimage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -40,7 +39,7 @@
             android:src="@drawable/websearch_close" />
 
         <ImageButton
-            android:id="@+id/increasewebsearch"
+            android:id="@+id/increaseshowimage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

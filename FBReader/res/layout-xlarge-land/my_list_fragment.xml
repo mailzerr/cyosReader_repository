@@ -1,56 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-	
-    <!-- android:id/list und NICHT @id+/blabla, weil diese ListView  zur Laufzeit aufgesucht wird-->
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:longClickable="true" 
-        >
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:background="#5d828b"
+        android:longClickable="true" >
     </ListView>
-    
-    <!-- special id for TextView: wird angezeigt, wenn ListView oben keine Elemente drin hat -->
+
     <TextView
         android:id="@android:id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="EPUB-Error: kein Inhaltsverzeichnis vorhanden!" />
-	
-    <LinearLayout
+
+    <RelativeLayout
+        android:id="@+id/structElButtons"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" 
-        android:layout_gravity="bottom"
-        >
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#5d828b" >
 
-		<ImageButton
-		    android:id="@+id/decrease"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:background="@android:color/transparent"
-		    android:src="@drawable/decrease_land" />
+        <ImageButton
+            android:id="@+id/decrease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/decrease_land" />
 
-        <!-- Platzhalter, damit kleiner-groesser buttons auseinander am Rand der View stehen -->
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_gravity="bottom"
-            android:layout_weight="1" />
-            
         <ImageButton
             android:id="@+id/increase"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
+            android:baselineAlignBottom="true"
             android:src="@drawable/increase_land" />
+    </RelativeLayout>
 
-    </LinearLayout>
-	
-</LinearLayout>
+</RelativeLayout>

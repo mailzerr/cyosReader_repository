@@ -45,19 +45,19 @@ public class SelectionWebSearchAction extends FBAndroidAction {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
 		
-		FragmentManager fm = act.getFragmentManager();
+		FragmentManager fm = act.getFragmentManager(); // meinen einzigen FragmentManager holen
 		FragmentTransaction transaction = fm.beginTransaction();
-		Fragment StructElFrag = fm.findFragmentByTag("StructureElements");
+
+		Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag");
 //		hide strElFrag:
 		transaction.detach(StructElFrag); 
 		
 //		entferne das geöffnete Fragment bis auf den Strukturbereich:
 //		TODO: überprüfen, was passiert, wenn es mehrere Fragmente auf dem Stack sind
-		if (fm.getBackStackEntryCount() > 2)	{
+		if (fm.getBackStackEntryCount() > 1)	{
 			fm.popBackStack();
 		}
 	
-//		transaction.replace(R.id.fragment_container, myWVFrag, "websearch");
 		transaction.add(R.id.fragment_container, myWVFrag, "websearch");
 		transaction.addToBackStack("websearch");
 		transaction.commit();

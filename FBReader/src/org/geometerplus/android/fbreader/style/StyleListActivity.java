@@ -22,26 +22,36 @@ package org.geometerplus.android.fbreader.style;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.*;
-import android.text.Editable;
-import android.view.*;
-import yuku.ambilwarna.widget.AmbilWarnaPrefWidgetView;
-
+import org.geometerplus.android.fbreader.StructureElementsFragment;
+import org.geometerplus.android.fbreader.api.FBReaderIntents;
+import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
+import org.geometerplus.android.util.ViewUtil;
+import org.geometerplus.fbreader.book.Book;
+import org.geometerplus.fbreader.book.BookEvent;
+import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.book.HighlightingStyle;
+import org.geometerplus.fbreader.book.IBookCollection;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.util.ZLColor;
 import org.geometerplus.zlibrary.ui.android.R;
 import org.geometerplus.zlibrary.ui.android.util.ZLAndroidColorUtil;
-import org.geometerplus.fbreader.book.*;
-import org.geometerplus.fbreader.fbreader.FBReaderApp;
-import org.geometerplus.android.fbreader.StructureElementsFragment;
-import org.geometerplus.android.fbreader.api.FBReaderIntents;
-import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
-import org.geometerplus.android.util.ViewUtil;
+
+import yuku.ambilwarna.widget.AmbilWarnaPrefWidgetView;
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.ListActivity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class StyleListActivity extends ListActivity implements IBookCollection.Listener {
 	public static final String EXISTING_BOOKMARK_KEY = "existing.bookmark";
@@ -185,21 +195,20 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 					if (style != null) {
 						myBookmark.setStyleId(style.Id);
 						myCollection.saveBookmark(myBookmark);
-						
 						// TODO Stelle um die Daten zum Fragment zu schicken!!
 						// zuerst soll ich einen Zugriff auf meine Activity bekommen.
 						//geschaaaft! hier:
-						
 						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
-						StructureElementsFragment myFragment = (StructureElementsFragment) act.getFragmentManager().findFragmentById(R.id.structureElements);
-						
+						FragmentManager fm = act.getFragmentManager();
+						StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+
 						// Einlesen des Structurelementnamens:
 //						EditText structElemNameField = (EditText) findViewById(R.id.structElemName);
 //						String structElemName = structElemNameField.getText().toString(); 
-						myFragment.saveStructureElement(myBookmark, "TESTTEST");
-						
-						//end
+						if(myFragment != null){
+							myFragment.saveStructureElement(myBookmark, "TESTTEST");
+						}
 					} else {
 						myCollection.deleteBookmark(myBookmark);
 					}

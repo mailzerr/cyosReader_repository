@@ -33,13 +33,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	private ZLTree<?> mySelectedItem;
 	private List<Bookmark> myStructElem;
 	
-	
-	/* (non-Javadoc)
-	 * @see android.app.Fragment#onSaveInstanceState(android.os.Bundle)
-	 */
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		/* beim Schliessen die Liste speichern: http://stackoverflow.com/questions/17810749/how-to-save-state-of-fragment-having-listview
 		oder: http://stackoverflow.com/questions/13680919/saving-listview-state-before-replacing-the-fragment
 		*/
@@ -53,15 +48,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		TOCTree treeToSelect = fbreader.getCurrentTOCElement();
 
 //		getActivity().getActionBar().setIcon(icon); Hier kann man uni hagen setzen
-		
-//		SET LAYOUT ORIENTATION
-		/*
-		Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
-		LinearLayout myRootLinearLayout = (LinearLayout) act.findViewById(R.id.root_linear_layout);
-		myRootLinearLayout.setOrientation(LinearLayout.VERTICAL);
-		*/
-//		********* END SET LAYOUT ORIENTATION
-		
 		
 		// finde Ebene, wo die Kapitelüberschriften sind:
 		while (treeToSelect.Level > 1) {
@@ -209,13 +195,15 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					final View view = getActivity().findViewById(R.id.fragment_container);
 					int newWidth = view.getWidth();
 					int newHeight = view.getHeight();
-					
-					//set the color fo decrease button to default
-					ImageButton imgButtonDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
-					imgButtonDecrease.setImageResource(R.drawable.decrease_land_default);
-					
+
 					ImageButton imgButtonIncrease = (ImageButton) getActivity().findViewById(R.id.increase);
+					ImageButton imgButtonDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
+					
 					if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+						//set the color fo decrease button to default
+						imgButtonDecrease.setImageResource(R.drawable.decrease_land_default);
+						
 						//prüfen, ob der Strukturbereich nicht zu gross ist
 						if(newWidth > 600) {
 							imgButtonIncrease.setImageResource(R.drawable.increase_land_disabled);
@@ -238,18 +226,21 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 						    });
 						    anim.setDuration(animDuration);
 						    anim.start();
-						// anim end
+						// end animation 
 					}
 					else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+						//set the color fo decrease button to default
+						imgButtonDecrease.setImageResource(R.drawable.decrease_port_default);
+
 						//prüfen, ob der Strukturbereich nicht zu gross wird
-						if(newHeight > 600) {
+						if(newHeight > 500) {
 							imgButtonIncrease.setImageResource(R.drawable.increase_port_disabled);
 							return;
 						}
 						else {
-							imgButtonDecrease.setImageResource(R.drawable.increase_port_default);
+							imgButtonIncrease.setImageResource(R.drawable.increase_port_default);
 						}
-						
 						// start anim with Value Animator:
 						ValueAnimator anim = ValueAnimator.ofInt(view.getHeight(), view.getHeight() + layoutChangeValue);
 						    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -273,19 +264,17 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			btnDecrease.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-//					final Fragment frag = getActivity().getFragmentManager().findFragmentById(R.id.structureElements);
-//					final View view = frag.getView();
 					final View view = getActivity().findViewById(R.id.fragment_container);
 					int mWidth = view.getWidth();
 					int mHeight = view.getHeight();
 
-					//set the color of increase button to default
 					ImageButton imgButtonIncrease = (ImageButton) getActivity().findViewById(R.id.increase);
-					imgButtonIncrease.setImageResource(R.drawable.increase_land_default);
-					
 					ImageButton imgButtonDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
 					
 					if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						//set the color of increase button to default
+						imgButtonIncrease.setImageResource(R.drawable.increase_land_default);
+						
 						//prüfen, ob der Strukturbereich gross genug ist
 						if(mWidth < 250) {
 							imgButtonDecrease.setImageResource(R.drawable.decrease_land_disabled);
@@ -317,6 +306,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					    */
 					}
 					else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+						//set the color of increase button to default
+						imgButtonIncrease.setImageResource(R.drawable.increase_port_default);
 						//prüfen, ob der Strukturbereich gross genug ist
 						
 						if (mHeight < 250) {
@@ -403,6 +394,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
 		return inflater.inflate(R.layout.my_list_fragment, container, false);
 	}
 
@@ -479,7 +471,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 
 		/*
-		 * oben in der gleichen Daten implments onItemLongClickListener einkommentieren
+		 * oben in der gleichen Datei implments onItemLongClickListener einkommentieren
 		@Override
 		public boolean onItemLongClick(AdapterView<?> parent, View view,
 				int position, long id) {

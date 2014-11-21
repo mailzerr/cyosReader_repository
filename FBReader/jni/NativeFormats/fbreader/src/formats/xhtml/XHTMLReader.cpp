@@ -420,7 +420,7 @@ void XHTMLTagImageAction::doAtStart(XHTMLReader &reader, const char **xmlattribu
 		if (reader.myCurrentParagraphIsEmpty) {
 			bookReader(reader).addControl(IMAGE, true);
 		} else {
-			endParagraph(reader);
+		//	endParagraph(reader);
 		}
 	}
 	const std::string imageName = imageFile.name(false);
@@ -429,7 +429,7 @@ void XHTMLTagImageAction::doAtStart(XHTMLReader &reader, const char **xmlattribu
 	reader.myMarkNextImageAsCover = false;
 	if (flagParagraphIsOpen && reader.myCurrentParagraphIsEmpty) {
 		bookReader(reader).addControl(IMAGE, false);
-		endParagraph(reader);
+	//	endParagraph(reader);
 	}
 }
 
