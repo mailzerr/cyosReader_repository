@@ -1,9 +1,17 @@
 package org.geometerplus.android.fbreader;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.geometerplus.android.util.ViewUtil;
 import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.book.SerializerUtil;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
@@ -24,12 +32,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class StructureElementsFragment extends ListFragment implements AdapterView.OnItemClickListener, OnClickListener {
 	private TOCAdapter myAdapter;
 	private ZLTree<?> mySelectedItem;
 	private List<Bookmark> myStructElem;
-
+	private boolean oldElementsLoaded = false;
 	final int animDuration = 500;
 	final int layoutChangeValue = 100;
 	
@@ -133,6 +142,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
+			exportStructureElementsToFile();
 			// Code TOCActivity.java start
 			final TOCTree root = fbreader.Model.TOCTree;
 			myAdapter = new TOCAdapter(root);   // TODO set onItemLongClickListener, evtl. auch mOnScrollListener, mOnHierarchyChangeListener
@@ -150,6 +160,15 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			myBtnDecrease = (ImageButton) getActivity().findViewById(R.id.decrease);
 			myBtnIncrease.setOnClickListener(this);
 			myBtnDecrease.setOnClickListener(this);
+			
+			//holen von zuvor allen gespeicherten Strukturelementen
+				oldElementsLoaded = true;
+				List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
+				for(Bookmark b : oldElements){
+					saveStructureElement(b, "old");
+				}
+				update();
+			
 		}
 	}
 
@@ -407,5 +426,46 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	
 	public void update() {
 		myAdapter.notifyDataSetChanged();
+	}
+	
+	public void exportStructureElementsToFile(){
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		
+		//get saved bookmarks and serialize the bookmark list:
+		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		List<String> serializedBookmarks = SerializerUtil.serializeBookmarkList(bookmarks);
+		
+		if(serializedBookmarks.isEmpty()){
+			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG);
+			return;
+		}
+		
+		String path = fbreader.getCurrentBook().File.getPath();
+		String fileName = fbreader.getCurrentBook().File.getShortName();
+		path = path.substring(0, path.length() - fileName.length());
+		
+		//Create Current timestamp:
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY);
+        String currentTimeStamp = dateFormat.format(new Date()); 
+		
+		// Generate a filename
+		String exportedFileName = "Strukturelemente_" + fileName + "_" + currentTimeStamp +".txt";
+		//create File:
+		File structElementsFile = new File ("/storage/emulated/0/Books" + "/" + exportedFileName);
+		try {
+			structElementsFile.createNewFile();
+			FileOutputStream fout = new FileOutputStream(structElementsFile);
+			OutputStreamWriter myOutWriter = new OutputStreamWriter(fout);
+			
+			for(String s : serializedBookmarks){
+				myOutWriter.append(s);
+			}
+			
+			myOutWriter.close();
+			fout.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

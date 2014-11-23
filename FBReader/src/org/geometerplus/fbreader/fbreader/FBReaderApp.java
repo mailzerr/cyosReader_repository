@@ -277,8 +277,11 @@ public final class FBReaderApp extends ZLApplication {
 	public List<Bookmark> getVisibleBookmarks(){
 		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
 			 List<Bookmark> myBookmarks = Collection.bookmarks(query);
-//			 List myBookmarksNEW = Collection.bookmarks(new BookmarkQuery(Model.Book, true, 100));
-		return myBookmarks;
+			 List myBookmarksNEW = Collection.bookmarks(new BookmarkQuery(Model.Book, true, 100));
+			 if (myBookmarks.isEmpty()){
+				 return Collections.emptyList();
+			 }
+			 return myBookmarks;
 		}
 	}
 	

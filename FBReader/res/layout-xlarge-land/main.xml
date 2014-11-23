@@ -8,7 +8,7 @@
         android:id="@+id/fragment_container"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:background="#8b5d82" />
+        android:background="#5d828b" />
 
     <org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget
         android:id="@+id/main_view"

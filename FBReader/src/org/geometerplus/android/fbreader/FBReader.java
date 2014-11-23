@@ -209,7 +209,7 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(this));
-		
+
 		myFragmentManager = getFragmentManager();
 		
 //		 new stuff 
@@ -225,6 +225,11 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		transaction.addToBackStack("StructureElementsFragment");
 		transaction.commit();
 		// end new stuff
+		
+		//new stuff: adding buttons to action bar
+		
+		//new stuff: adding buttons to action bar
+		
 		
 		bindService(
 			new Intent(this, DataService.class),
