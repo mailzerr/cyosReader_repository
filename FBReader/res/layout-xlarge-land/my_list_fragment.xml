@@ -44,4 +44,32 @@
             android:src="@drawable/increase_land" />
     </RelativeLayout>
 
+      <!--   
+    </RelativeLayout>
+        <RelativeLayout
+        android:id="@+id/ExportImportButtonsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#5d828b" >
+
+        <Button
+            android:id="@+id/exportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@android:color/transparent"
+            android:text="Export..." 
+            />
+
+        <Button
+            android:id="@+id/importButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            android:baselineAlignBottom="true"
+            android:text="Import..." 
+            />
+    </RelativeLayout> -->
 </RelativeLayout>

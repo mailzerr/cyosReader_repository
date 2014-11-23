@@ -56,7 +56,6 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View webSearchView = inflater.inflate(R.layout.web_search_fragment, container, false);
 		
-		
 		if (savedInstanceState != null) // TODO
 		{// wird bei Änderung der Orientierung ausgeführt
 			mySearchTerm = savedInstanceState.getString("mySearchTerm");
@@ -64,6 +63,8 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 		}
 		
 		myWebView = (WebView) webSearchView.findViewById(R.id.webSearch);
+
+		//Java Script einschalten: 
 		myWebView.getSettings().setJavaScriptEnabled(true);
 		myWebView.setWebViewClient(new WebViewClient());
 		// dictionary
@@ -102,8 +103,6 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		ImageButton btnIncrease = (ImageButton) getActivity().findViewById(R.id.increasewebsearch);
-		ImageButton btnDecrease = (ImageButton) getActivity().findViewById(R.id.decreasewebsearch);
 		if (v.getId() == R.id.close_websearch) {
 			
 			final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
@@ -129,14 +128,14 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				// set the color fo decrease button to default
-				btnDecrease.setImageResource(R.drawable.decrease_land_default);
+				myBtnDecrease.setImageResource(R.drawable.decrease_land_default);
 
 				// prüfen, ob der Strukturbereich nicht zu gross ist
 				if (newWidth > 600) {
-					btnIncrease.setImageResource(R.drawable.increase_land_disabled);
+					myBtnIncrease.setImageResource(R.drawable.increase_land_disabled);
 					return;
 				} else {
-					btnIncrease.setImageResource(R.drawable.increase_land_default);
+					myBtnIncrease.setImageResource(R.drawable.increase_land_default);
 				}
 				
 				// start anim with Value Animator:
@@ -156,14 +155,14 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 				// end animation
 			} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 				// set the color fo decrease button to default
-				btnDecrease.setImageResource(R.drawable.decrease_port_default);
+				myBtnDecrease.setImageResource(R.drawable.decrease_port_default);
 
 				// prüfen, ob der Strukturbereich nicht zu gross wird
 				if (newHeight > 500) {
-					btnIncrease.setImageResource(R.drawable.increase_port_disabled);
+					myBtnIncrease.setImageResource(R.drawable.increase_port_disabled);
 					return;
 				} else {
-					btnIncrease.setImageResource(R.drawable.increase_port_default);
+					myBtnIncrease.setImageResource(R.drawable.increase_port_default);
 				}
 				// start anim with Value Animator:
 				ValueAnimator anim = ValueAnimator.ofInt(view.getHeight(), view.getHeight() + layoutChangeValue);
@@ -189,13 +188,13 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 				// set the color of increase button to default
-				btnIncrease.setImageResource(R.drawable.increase_land_default);
+				myBtnIncrease.setImageResource(R.drawable.increase_land_default);
 				// prüfen, ob der Strukturbereich gross genug ist
 				if (mWidth < 250) {
-					btnDecrease.setImageResource(R.drawable.decrease_land_disabled);
+					myBtnDecrease.setImageResource(R.drawable.decrease_land_disabled);
 					return;
 				} else {
-					btnDecrease.setImageResource(R.drawable.decrease_land_default);
+					myBtnDecrease.setImageResource(R.drawable.decrease_land_default);
 				}
 
 				// start anim with Value Animator:
@@ -221,13 +220,13 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 				 */
 			} else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 				// set the color of increase button to default
-				btnIncrease.setImageResource(R.drawable.increase_port_default);
+				myBtnIncrease.setImageResource(R.drawable.increase_port_default);
 				// prüfen, ob der Strukturbereich gross genug ist
 				if (mHeight < 250) {
-					btnDecrease.setImageResource(R.drawable.decrease_port_disabled);
+					myBtnDecrease.setImageResource(R.drawable.decrease_port_disabled);
 					return;
 				} else {
-					btnDecrease.setImageResource(R.drawable.decrease_port_default);
+					myBtnDecrease.setImageResource(R.drawable.decrease_port_default);
 				}
 
 				// start anim with Value Animator:

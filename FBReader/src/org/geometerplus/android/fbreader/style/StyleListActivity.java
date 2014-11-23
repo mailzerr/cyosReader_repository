@@ -31,6 +31,7 @@ import org.geometerplus.fbreader.book.BookEvent;
 import org.geometerplus.fbreader.book.Bookmark;
 import org.geometerplus.fbreader.book.HighlightingStyle;
 import org.geometerplus.fbreader.book.IBookCollection;
+import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
@@ -194,7 +195,10 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 				public void run() {
 					if (style != null) {
 						myBookmark.setStyleId(style.Id);
-						myCollection.saveBookmark(myBookmark);
+						myCollection.saveBookmark(myBookmark); 
+
+						//stuff COPY!!!!!
+						// PART 1
 						// TODO Stelle um die Daten zum Fragment zu schicken!!
 						// zuerst soll ich einen Zugriff auf meine Activity bekommen.
 						//geschaaaft! hier:
@@ -202,13 +206,21 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
 						FragmentManager fm = act.getFragmentManager();
 						StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
-
-						// Einlesen des Structurelementnamens:
-//						EditText structElemNameField = (EditText) findViewById(R.id.structElemName);
-//						String structElemName = structElemNameField.getText().toString(); 
 						if(myFragment != null){
 							myFragment.saveStructureElement(myBookmark, "TESTTEST");
+							myFragment.update();
 						}
+						/*						
+						// PART 2
+						List<Bookmark> myList = fbreader.getVisibleBookmarks();
+						if(myList != null && myFragment != null) {
+								for(Bookmark b: myList){
+									myFragment.saveStructureElement(b, "TESTTEST");
+								}
+						}
+						// END PART 2
+						//stuff
+						*/
 					} else {
 						myCollection.deleteBookmark(myBookmark);
 					}

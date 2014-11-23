@@ -274,6 +274,15 @@ public final class FBReaderApp extends ZLApplication {
 		return bookmark;
 	}
 
+	public List<Bookmark> getVisibleBookmarks(){
+		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
+			 List<Bookmark> myBookmarks = Collection.bookmarks(query);
+//			 List myBookmarksNEW = Collection.bookmarks(new BookmarkQuery(Model.Book, true, 100));
+		return myBookmarks;
+		}
+	}
+	
+	
 	private void setBookmarkHighlightings(ZLTextView view, String modelId) {
 		view.removeHighlightings(BookmarkHighlighting.class);
 		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
