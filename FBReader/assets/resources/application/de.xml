@@ -286,6 +286,8 @@
 		<node name="bookInfo" value="Buchinformation"/>
 		<node name="library" value="Bibliothek"/>
 		<node name="toc" value="Inhaltsverzeichnis"/>
+		<node name="importElements" value="Importieren.."/>
+		<node name="exportElements" value="Exportieren.."/>
 		<node name="day" value="Tag Modus"/>
 		<node name="night" value="Nacht Modus"/>
 		<node name="yotaSwitchToBackScreen" value="Auf den Rückseitenbildschirm umschalten"/>

@@ -1,10 +1,15 @@
 package org.geometerplus.android.fbreader;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -55,7 +60,11 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	public void saveStructureElement(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		TOCTree treeToSelect = fbreader.getCurrentTOCElement();
+		//____________________________________//____________________________________
 		
+//		if(treeToSelect == null) return; // NPE? fixen!
+		//____________________________________//____________________________________
+
 		// finde Ebene, wo die Kapitelüberschriften sind:
 		while (treeToSelect.Level > 1) {
 			treeToSelect = treeToSelect.Parent;
@@ -142,7 +151,12 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
-			exportStructureElementsToFile();
+			
+			try {
+				exportStructureElementsToFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			// Code TOCActivity.java start
 			final TOCTree root = fbreader.Model.TOCTree;
 			myAdapter = new TOCAdapter(root);   // TODO set onItemLongClickListener, evtl. auch mOnScrollListener, mOnHierarchyChangeListener
@@ -187,6 +201,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 
 	private static final int PROCESS_TREE_ITEM_ID = 0;
 	private static final int READ_BOOK_ITEM_ID = 1;
+	
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		final int position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
@@ -275,8 +290,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			return true;
 		}
 	}
-
-	
 	
 	@Override
 	public void onClick(View v) {
@@ -398,22 +411,10 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 	}
 
-	public void restoreStructureElementsFromDB(){
-	/*	
+	public void restoreStructureElementsFromDB() {
 	 	final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-		Activity act = (Activity) fbreader.getMyWindow();
-		FragmentManager fm = act.getFragmentManager();
-		StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
-
-		List<Bookmark> myLiskkt = fbreader.getVisibleBookmarks();
-		myAdapter.resetTree();
-		if (myLiskkt != null && myFragment != null) {
-			for (Bookmark b : myLiskkt) {
-				myFragment.saveStructureElement(b, "TESTTEST");
-			}
-		}
-		*/
-	 	final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+//		Activity act = (Activity) fbreader.getMyWindow();
+//		FragmentManager fm = act.getFragmentManager();
 		StructureElementsFragment myFragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
 
 		List<Bookmark> myLiskkt = fbreader.getVisibleBookmarks();
@@ -425,18 +426,20 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	}
 	
 	public void update() {
-		myAdapter.notifyDataSetChanged();
+	//	myAdapter.notifyDataSetChanged();
 	}
 	
-	public void exportStructureElementsToFile(){
+	public void exportStructureElementsToFile() throws IOException{
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		
+		
 		
 		//get saved bookmarks and serialize the bookmark list:
 		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
 		List<String> serializedBookmarks = SerializerUtil.serializeBookmarkList(bookmarks);
 		
 		if(serializedBookmarks.isEmpty()){
-			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG);
+			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG).show();;
 			return;
 		}
 		
@@ -453,12 +456,12 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		//create File:
 		File structElementsFile = new File ("/storage/emulated/0/Books" + "/" + exportedFileName);
 		try {
-			structElementsFile.createNewFile();
+//			Boolean success = structElementsFile.createNewFile();
 			FileOutputStream fout = new FileOutputStream(structElementsFile);
 			OutputStreamWriter myOutWriter = new OutputStreamWriter(fout);
 			
-			for(String s : serializedBookmarks){
-				myOutWriter.append(s);
+			for(String s : serializedBookmarks) {
+				myOutWriter.append(s + ",,,,,");
 			}
 			
 			myOutWriter.close();
@@ -467,5 +470,45 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		String tempPath = "/storage/emulated/0/Books" + "/" + exportedFileName;
+		importStructureElementsFromFile(tempPath);
+	}
+	
+	public void importStructureElementsFromFile(String pathToOpen) throws IOException{
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		List<String> readedStrElem = new ArrayList<String>();
+		String[] strArray;
+		
+		//File einlesen:
+//		File myFile = new File(pathToOpen);
+		File myFile = new File(pathToOpen);
+		FileInputStream fInput = new FileInputStream(myFile);
+		BufferedReader myBufReader = new BufferedReader(new InputStreamReader(fInput));
+		String aDataRow = "";
+		String aBuffer = "";
+		while ((aDataRow = myBufReader.readLine()) != null) {
+			aBuffer += aDataRow;
+		}
+		if(aBuffer.length() > 0) {
+			strArray = aBuffer.split(",,,,,");
+			for( String s : strArray){
+				if(s.length() > 10){
+					readedStrElem.add(s);
+				}
+			}
+		}
+		myBufReader.close();
+		//////////////////////
+
+		List<Bookmark> importedBookmarks = SerializerUtil.deserializeBookmarkList(readedStrElem);
+		if(importedBookmarks.isEmpty()) {
+			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG).show();
+			return;
+		}
+		
+		//find duplicate and erase them from importedBookmarks list:
+		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		bookmarks.retainAll(importedBookmarks); // TODO testen!!
 	}
 }

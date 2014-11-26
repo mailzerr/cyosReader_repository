@@ -312,6 +312,12 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		myFBReaderApp.addAction(ActionCode.SELECTION_BOOKMARK, new SelectionBookmarkAction(this, myFBReaderApp));
 		//end new actions
 		
+		// adding export/import of structure elements
+		//myFBReaderApp.addAction(ActionCode.SHOW_LIBRARY, new ShowLibraryAction(this, myFBReaderApp));
+		myFBReaderApp.addAction(ActionCode.EXPORT_STRUCTURE_ELEMENTS, new ShowExportAction(this, myFBReaderApp));
+		myFBReaderApp.addAction(ActionCode.IMPORT_STRUCTURE_ELEMENTS, new ShowImportAction(this, myFBReaderApp));
+		// end adding export/import of structure elements
+		
 		myFBReaderApp.addAction(ActionCode.PROCESS_HYPERLINK, new ProcessHyperlinkAction(this, myFBReaderApp));
 		myFBReaderApp.addAction(ActionCode.OPEN_VIDEO, new OpenVideoAction(this, myFBReaderApp));
 

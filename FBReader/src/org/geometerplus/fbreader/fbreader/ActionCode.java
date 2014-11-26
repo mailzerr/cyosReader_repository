@@ -20,6 +20,9 @@
 package org.geometerplus.fbreader.fbreader;
 
 public interface ActionCode {
+	String EXPORT_STRUCTURE_ELEMENTS = "exportElements";
+	String IMPORT_STRUCTURE_ELEMENTS = "importElements";
+	
 	String SHOW_LIBRARY = "library";
 	String SHOW_PREFERENCES = "preferences";
 	String SHOW_BOOK_INFO = "bookInfo";
