@@ -3,7 +3,6 @@ package org.geometerplus.android.fbreader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
 import org.geometerplus.android.util.ViewUtil;
 import org.geometerplus.fbreader.book.Bookmark;
 import org.geometerplus.fbreader.book.SerializerUtil;
@@ -26,6 +26,8 @@ import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.zlibrary.ui.android.R;
 
 import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.ListFragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -42,7 +44,6 @@ import android.widget.Toast;
 public class StructureElementsFragment extends ListFragment implements AdapterView.OnItemClickListener, OnClickListener {
 	private TOCAdapter myAdapter;
 	private ZLTree<?> mySelectedItem;
-	private List<Bookmark> myStructElem;
 	private boolean oldElementsLoaded = false;
 	final int animDuration = 500;
 	final int layoutChangeValue = 100;
@@ -56,19 +57,24 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		oder: http://stackoverflow.com/questions/13680919/saving-listview-state-before-replacing-the-fragment
 		super.onSaveInstanceState(outState);
 	}
-
+/*
+	public void restoreStructureElement(Bookmark b, String structElemName){
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		fbreader.Collection.saveBookmark(b);
+		saveStructureElement(b, structElemName);
+	}
+	*/
 	public void saveStructureElement(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-		TOCTree treeToSelect = fbreader.getCurrentTOCElement();
-		//____________________________________//____________________________________
 		
-//		if(treeToSelect == null) return; // NPE? fixen!
-		//____________________________________//____________________________________
-
-		// finde Ebene, wo die Kapitelüberschriften sind:
+		TOCTree treeToSelect = fbreader.getCurrentTOCElement();  //alt (26.11.2014)
+//		TOCTree treeToSelect = fbreader.Model.TOCTree; //neu	
+		
+		// finde die Ebene, wo die Kapitelüberschriften sind:
 		while (treeToSelect.Level > 1) {
 			treeToSelect = treeToSelect.Parent;
-		}// treeToSelect zeigt jetzt auf ein TOCElement des richtigen Kapitels (d.h. der Strukturelement befindet sich im treeToSelect)
+		}
+		// treeToSelect zeigt ab jetzt auf ein TOCElement des richtigen Kapitels (d.h. der Strukturelement befindet sich im treeToSelect)
 		
 		// nun muss man die Einfügeposition im subtree des richtigen Kapitels finden...
 		// (weil ja im Exposse (s.8) steht: "gemäß dem Textverlauf"
@@ -77,14 +83,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		// Wenn subtree leer ist: als erstes Element einfügen
 		if(subtrees.isEmpty()) {
 			TOCTree toc = new TOCTree(treeToSelect);
-			// TODO toc initialisieren
-
-			// Bookmark-text
-			if (b.getText().length() > 30) {
-				toc.setText(b.getText().substring(0, 30) + "..");
-			} else {
-				toc.setText(b.getText());
-			}
+			toc.setText(b.getText());
 
 			if (toc.getReference() == null) {
 				toc.setReference(null, b.ParagraphIndex);
@@ -100,16 +99,9 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					}
 				}
 				// richtige Einfügeposition gefunden: einfügen
-				TOCTree toc = new TOCTree(treeToSelect, i); //in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
-				//damit man die Einfügepopsition auch übergeben kann
-				//Bookmark-text
-
-				if (b.getText().length() > 30) {
-					toc.setText(b.getText().substring(0, 30) + "..");
-				} else {
-					toc.setText(b.getText());
-				}
-
+				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
+															// damit man die Einfügepopsition auch übergeben kann
+				toc.setText(b.getText());
 				if (toc.getReference() == null) {
 					toc.setReference(null, b.ParagraphIndex);
 				}
@@ -120,7 +112,60 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		myAdapter.notifyDataSetChanged();
 		return;
 	}
-/////////////////////////////////////////////////////
+	
+	public void saveStructureElementImproved(Bookmark b, String structElemName) {
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		TOCTree treeToSelect = null;
+		if(fbreader.Model != null){
+			TOCTree root = fbreader.Model.TOCTree;
+			//find right toctree to insert the bookmark b:
+			for (int i = 0; i < root.subtrees().size(); i++) {
+				if(b.getParagraphIndex() > root.subtrees().get(i).getReference().ParagraphIndex) {
+					//richtiges Kapitel zum Einfügen gefunden:
+					treeToSelect = root.subtrees().get(i);
+					
+				}
+			}
+		}
+		
+		// nun muss man die Einfügeposition im subtree des richtigen Kapitels finden...
+		// (weil ja im Exposse (s.8) steht: "gemäß dem Textverlauf"
+		List<TOCTree> subtrees = treeToSelect.subtrees();
+		
+		// Wenn subtree leer ist: als erstes Element einfügen
+		if(subtrees.isEmpty()) {
+			TOCTree toc = new TOCTree(treeToSelect);
+			toc.setText(b.getText());
+
+			if (toc.getReference() == null) {
+				toc.setReference(null, b.ParagraphIndex);
+			}
+		} else { // sonst solange t.getReference().ParagraphIndex < b.getParagraphIndex()
+			for (int i = 0; i < subtrees.size(); i++) {
+				if (subtrees.get(i).getReference().ParagraphIndex < b.getParagraphIndex()) {
+					if (i != subtrees.size() - 1) {
+						continue;
+					}
+					else {
+						i++;
+					}
+				}
+				// richtige Einfügeposition gefunden: einfügen
+				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
+															// damit man die Einfügepopsition auch übergeben kann
+				toc.setText(b.getText());
+				if (toc.getReference() == null) {
+					toc.setReference(null, b.ParagraphIndex);
+				}
+				break;
+			}
+		}
+//		//informiere den Adapter über die Änderungen
+//		myAdapter.notifyDataSetChanged();
+		return;
+	}
+
+	/////////////////////////////////////////////////////
 //___________________EVTL. WICHTIGE VERBESSERUNGEN___________________
 	// Im Modus ohne Kapitelüberschriften muss beim Longklick ein Contextmenu angezeigt werden, in dem nach dem Elternelement gefragt wird. 
 	// Beispiel: ich möchte alle Zitate unter einen Hut bringen und setze als Elternelement einen bestimmten Knoten.
@@ -151,20 +196,9 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
-			
-			try {
-				exportStructureElementsToFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			// Code TOCActivity.java start
 			final TOCTree root = fbreader.Model.TOCTree;
-			myAdapter = new TOCAdapter(root);   // TODO set onItemLongClickListener, evtl. auch mOnScrollListener, mOnHierarchyChangeListener
-			final ZLTextWordCursor cursor = fbreader.BookTextView.getStartCursor();
-			int index = cursor.getParagraphIndex();
-			if (cursor.isEndOfParagraph()) {
-				++index;
-			}
+			myAdapter = new TOCAdapter(root);   // TODO nicht zurücksetzen!
+			
 			TOCTree treeToSelect = fbreader.getCurrentTOCElement();
 			myAdapter.selectItem(treeToSelect);
 			mySelectedItem = treeToSelect;
@@ -175,16 +209,42 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			myBtnIncrease.setOnClickListener(this);
 			myBtnDecrease.setOnClickListener(this);
 			
-			//holen von zuvor allen gespeicherten Strukturelementen
-				oldElementsLoaded = true;
-				List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
-				for(Bookmark b : oldElements){
-					saveStructureElement(b, "old");
+			//holen von zuvor allen gespeicherten Strukturelementen um sie im Strukturbereich anzuzeigen:
+			List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
+			if (oldElementsLoaded == false && !oldElements.isEmpty()) {
+				oldElementsLoaded = true; // garantieren, dass der Code unten nur ein Mal ausgeführt wird (alte Lesezeichen geholt werden)
+				
+				Activity act = (Activity) fbreader.getMyWindow(); 
+				FragmentManager fm = act.getFragmentManager();
+				StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+				if(myFragment != null) {
+					for(Bookmark b : oldElements) {
+//						myFragment.restoreStructureElement(b, "restored");
+						myFragment.saveStructureElementImproved(b, "old_bookmarks");
+//						myFragment.update();
+					}
 				}
-				update();
-			
+			}
+			//holen von zuvor allen gespeicherten Strukturelementen um sie im Strukturbereich anzuzeigen:
+//			List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
+//			if (oldElementsLoaded == false && !oldElements.isEmpty()) {
+//				oldElementsLoaded = true; // garantieren, dass der Code unten nur ein Mal ausgeführt wird (alte Lesezeichen geholt werden)
+//				
+//				Activity act = (Activity) fbreader.getMyWindow(); 
+//				FragmentManager fm = act.getFragmentManager();
+//				StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+//				if(myFragment != null) {
+//					for(Bookmark b : oldElements) {
+////						myFragment.restoreStructureElement(b, "restored");
+//						myFragment.saveStructureElement(b, "old_bookmarks");
+////						myFragment.update();
+//					}
+//				}
+//			}
 		}
 	}
+	
+	
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -201,7 +261,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 
 	private static final int PROCESS_TREE_ITEM_ID = 0;
 	private static final int READ_BOOK_ITEM_ID = 1;
-	
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		final int position = ((AdapterView.AdapterContextMenuInfo) item.getMenuInfo()).position;
@@ -235,8 +294,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 
 		@Override
-		public void onCreateContextMenu(ContextMenu menu, View view,
-				ContextMenu.ContextMenuInfo menuInfo) {
+		public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+		
 			final int position = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
 			final TOCTree tree = (TOCTree) getItem(position);
 			if (tree.hasChildren()) {
@@ -256,7 +315,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			final View view = (convertView != null) 
+			final View view = (convertView != null)
 					? convertView
 					: LayoutInflater.from(parent.getContext()).inflate(R.layout.toc_tree_item, parent, false);
 			final TOCTree tree = (TOCTree) getItem(position);
@@ -265,7 +324,17 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					: 0);
 
 			setIcon(ViewUtil.findImageView(view, R.id.toc_tree_item_icon), tree);
-			ViewUtil.findTextView(view, R.id.toc_tree_item_text).setText(tree.getText());
+			//test: Anzeigetext abkürzen
+			
+			String textToShow = "";
+			if (tree.getText().length() > 30) {
+				textToShow = tree.getText().substring(0, 30) + "..";
+			} else {
+				textToShow = tree.getText();
+			}
+			ViewUtil.findTextView(view, R.id.toc_tree_item_text).setText(textToShow);
+			//end test Anzeigetext abkürzen
+			//ViewUtil.findTextView(view, R.id.toc_tree_item_text).setText(tree.getText());
 			return view;
 		}
 
@@ -411,19 +480,21 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 	}
 
-	public void restoreStructureElementsFromDB() {
-	 	final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-//		Activity act = (Activity) fbreader.getMyWindow();
-//		FragmentManager fm = act.getFragmentManager();
-		StructureElementsFragment myFragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
-
-		List<Bookmark> myLiskkt = fbreader.getVisibleBookmarks();
-		if (myLiskkt != null && myFragment != null) {
-			for (Bookmark b : myLiskkt) {
-				myFragment.saveStructureElement(b, "TESTTEST");
-			}
-		}
-	}
+	
+//	// UNUSED METHOD
+//	public void restoreStructureElementsFromDB() {
+//	 	final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+////		Activity act = (Activity) fbreader.getMyWindow();
+////		FragmentManager fm = act.getFragmentManager();
+//		StructureElementsFragment myFragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
+//
+//		List<Bookmark> myLiskkt = fbreader.getVisibleBookmarks();
+//		if (myLiskkt != null && myFragment != null) {
+//			for (Bookmark b : myLiskkt) {
+//				myFragment.saveStructureElement(b, "TESTTEST");
+//			}
+//		}
+//	}
 	
 	public void update() {
 	//	myAdapter.notifyDataSetChanged();
@@ -431,8 +502,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	
 	public void exportStructureElementsToFile() throws IOException{
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-		
-		
 		
 		//get saved bookmarks and serialize the bookmark list:
 		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
@@ -461,7 +530,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			OutputStreamWriter myOutWriter = new OutputStreamWriter(fout);
 			
 			for(String s : serializedBookmarks) {
-				myOutWriter.append(s + ",,,,,");
+				myOutWriter.append(s + ",_,_,_,_,"); // Trennzeichen für die Bookmarks, um sie später mit RegEx zu splitten
 			}
 			
 			myOutWriter.close();
@@ -470,9 +539,10 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		String tempPath = "/storage/emulated/0/Books" + "/" + exportedFileName;
-		importStructureElementsFromFile(tempPath);
+	
+//		test:
+//		String tempPath = "/storage/emulated/0/Books" + "/" + exportedFileName;
+//		importStructureElementsFromFile(tempPath);
 	}
 	
 	public void importStructureElementsFromFile(String pathToOpen) throws IOException{
@@ -491,7 +561,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			aBuffer += aDataRow;
 		}
 		if(aBuffer.length() > 0) {
-			strArray = aBuffer.split(",,,,,");
+			strArray = aBuffer.split(",_,_,_,_,"); // regular Expression!
 			for( String s : strArray){
 				if(s.length() > 10){
 					readedStrElem.add(s);
@@ -509,6 +579,11 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		
 		//find duplicate and erase them from importedBookmarks list:
 		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
-		bookmarks.retainAll(importedBookmarks); // TODO testen!!
+		importedBookmarks.removeAll(bookmarks); // löscht Duplikate aus bereits vorhandenen Bookmarks
+		if( !importedBookmarks.isEmpty() ){
+			for(Bookmark b : importedBookmarks){
+				fbreader.Collection.saveBookmark(b);//TESTEN!!!!!! update des Strukturbereichs erfolgt in der onREsume() des Fragments
+			}
+		}
 	}
 }

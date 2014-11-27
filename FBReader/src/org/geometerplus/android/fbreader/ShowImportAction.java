@@ -35,10 +35,9 @@ class ShowImportAction extends FBAndroidAction {
 
 	@Override
 	protected void run(Object ... params) {
-		final Intent externalIntent =
-			new Intent(FBReaderIntents.Action.EXTERNAL_LIBRARY);
-		final Intent internalIntent =
-			new Intent(BaseActivity.getApplicationContext(), LibraryActivity.class);
+		final Intent externalIntent = new Intent(FBReaderIntents.Action.EXTERNAL_LIBRARY);
+		final Intent internalIntent = new Intent(BaseActivity.getApplicationContext(), LibraryActivity.class);
+		
 		if (PackageUtil.canBeStarted(BaseActivity, externalIntent, true)) {
 			try {
 				startLibraryActivity(externalIntent);

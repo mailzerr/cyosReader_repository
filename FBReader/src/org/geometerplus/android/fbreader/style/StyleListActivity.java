@@ -197,11 +197,8 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 						myBookmark.setStyleId(style.Id);
 						myCollection.saveBookmark(myBookmark); 
 
-						//stuff COPY!!!!!
-						// PART 1
 						// TODO Stelle um die Daten zum Fragment zu schicken!!
-						// zuerst soll ich einen Zugriff auf meine Activity bekommen.
-						//geschaaaft! hier:
+						// zuerst soll ich einen Zugriff auf meine Activity bekommen:
 						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
 						FragmentManager fm = act.getFragmentManager();
@@ -210,18 +207,9 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 							myFragment.saveStructureElement(myBookmark, "TESTTEST");
 							myFragment.update();
 						}
-						/*						
-						// PART 2
-						List<Bookmark> myList = fbreader.getVisibleBookmarks();
-						if(myList != null && myFragment != null) {
-								for(Bookmark b: myList){
-									myFragment.saveStructureElement(b, "TESTTEST");
-								}
-						}
-						// END PART 2
-						//stuff
-						*/
+						// end
 					} else {
+						// TODO: HIER AUCH das Strukturelement aus dem Strukturbereich löschen!!
 						myCollection.deleteBookmark(myBookmark);
 					}
 					finish();
