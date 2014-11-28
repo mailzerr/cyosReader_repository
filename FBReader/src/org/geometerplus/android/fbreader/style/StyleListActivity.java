@@ -31,7 +31,6 @@ import org.geometerplus.fbreader.book.BookEvent;
 import org.geometerplus.fbreader.book.Bookmark;
 import org.geometerplus.fbreader.book.HighlightingStyle;
 import org.geometerplus.fbreader.book.IBookCollection;
-import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
@@ -41,8 +40,10 @@ import org.geometerplus.zlibrary.ui.android.util.ZLAndroidColorUtil;
 
 import yuku.ambilwarna.widget.AmbilWarnaPrefWidgetView;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class StyleListActivity extends ListActivity implements IBookCollection.Listener {
@@ -204,13 +206,54 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 						FragmentManager fm = act.getFragmentManager();
 						StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
 						if(myFragment != null){
-							myFragment.saveStructureElement(myBookmark, "TESTTEST");
+							
+/*							///////////////////////////////
+							String userDescription;
+							AlertDialog.Builder alert = new AlertDialog.Builder(act.getApplicationContext());
+
+							alert.setTitle("mein Titel");
+							alert.setMessage("Möchten Sie Ihrer Auswahl einen Namen geben?");
+
+							// Set an EditText view to get user input 
+							final EditText input = new EditText(act.getApplicationContext());
+							alert.setView(input);
+
+							alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int whichButton) {
+								final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+								Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
+								FragmentManager fm = act.getFragmentManager();
+								StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+								if(myFragment != null){
+									input.getText().toString();
+								}
+							  }
+							});
+
+							alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							  public void onClick(DialogInterface dialog, int whichButton) {
+							    // Canceled.
+							  }
+							});
+
+							alert.show();
+							// see http://androidsnippets.com/prompt-user-input-with-an-alertdialog
+							///////////////////////////////
+*/
+							myFragment.saveStructureElement(myBookmark, "TEST");
 							myFragment.update();
 						}
-						// end
 					} else {
 						// TODO: HIER AUCH das Strukturelement aus dem Strukturbereich löschen!!
 						myCollection.deleteBookmark(myBookmark);
+						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+						Activity act = (Activity) fbreader.getMyWindow(); 
+						FragmentManager fm = act.getFragmentManager();
+						StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+						if(myFragment != null){
+							myFragment.deleteStructureElement(myBookmark);
+							myFragment.update();
+						}
 					}
 					finish();
 				}

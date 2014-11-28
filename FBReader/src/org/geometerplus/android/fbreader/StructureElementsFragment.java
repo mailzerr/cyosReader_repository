@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
 import org.geometerplus.android.util.ViewUtil;
 import org.geometerplus.fbreader.book.Bookmark;
 import org.geometerplus.fbreader.book.SerializerUtil;
@@ -22,15 +21,18 @@ import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
 import org.geometerplus.zlibrary.core.tree.ZLTree;
-import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 import org.geometerplus.zlibrary.ui.android.R;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -123,7 +125,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				if(b.getParagraphIndex() > root.subtrees().get(i).getReference().ParagraphIndex) {
 					//richtiges Kapitel zum Einfügen gefunden:
 					treeToSelect = root.subtrees().get(i);
-					
 				}
 			}
 		}
@@ -135,7 +136,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		// Wenn subtree leer ist: als erstes Element einfügen
 		if(subtrees.isEmpty()) {
 			TOCTree toc = new TOCTree(treeToSelect);
-			toc.setText(b.getText());
+			toc.setText("testik");//b.getText());
 
 			if (toc.getReference() == null) {
 				toc.setReference(null, b.ParagraphIndex);
@@ -153,7 +154,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				// richtige Einfügeposition gefunden: einfügen
 				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
 															// damit man die Einfügepopsition auch übergeben kann
-				toc.setText(b.getText());
+				toc.setText("testik");//b.getText());b.getText());
 				if (toc.getReference() == null) {
 					toc.setReference(null, b.ParagraphIndex);
 				}
@@ -196,6 +197,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
+			
+			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
 			final TOCTree root = fbreader.Model.TOCTree;
 			myAdapter = new TOCAdapter(root);   // TODO nicht zurücksetzen!
 			
@@ -221,10 +224,11 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					for(Bookmark b : oldElements) {
 //						myFragment.restoreStructureElement(b, "restored");
 						myFragment.saveStructureElementImproved(b, "old_bookmarks");
-//						myFragment.update();
+//						myAdapter.notifyDataSetChanged();
 					}
 				}
 			}
+	
 			//holen von zuvor allen gespeicherten Strukturelementen um sie im Strukturbereich anzuzeigen:
 //			List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
 //			if (oldElementsLoaded == false && !oldElements.isEmpty()) {
@@ -237,7 +241,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //					for(Bookmark b : oldElements) {
 ////						myFragment.restoreStructureElement(b, "restored");
 //						myFragment.saveStructureElement(b, "old_bookmarks");
-////						myFragment.update();
 //					}
 //				}
 //			}
@@ -496,11 +499,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		}
 //	}
 	
-	public void update() {
-	//	myAdapter.notifyDataSetChanged();
-	}
-	
-	public void exportStructureElementsToFile() throws IOException{
+	public void exportStructureElementsToFile() throws IOException {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		
 		//get saved bookmarks and serialize the bookmark list:
@@ -539,7 +538,22 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
+		
+		// SHOW save path to the user:
+		//DIALOG TEST
+		AlertDialog ad = new AlertDialog.Builder(getActivity()).create();
+		ad.setCancelable(false);
+		ad.setTitle("Exportieren erfolgreich abgeschlossen");
+		ad.setMessage("Sie finden die exportierten Strukturelemente in der cyosReader Bibliothek.\n"
+				+ "Dateiname: " + exportedFileName);
+		ad.setButton("Schließen", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		ad.show();
+
+//DIALOG TEST END
 //		test:
 //		String tempPath = "/storage/emulated/0/Books" + "/" + exportedFileName;
 //		importStructureElementsFromFile(tempPath);
@@ -586,4 +600,35 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			}
 		}
 	}
+	
+	public void update() {
+		myAdapter.notifyDataSetChanged();
+	}
+	
+	public void deleteStructureElement(Bookmark b){
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		if(fbreader.Model != null) {
+			TOCTree root = fbreader.Model.TOCTree; // Level 0
+			
+			//find right toctree to insert the bookmark b:
+			for (int i = 0; i < root.subtrees().size(); i++) { // für alle
+																// (Kapitel)
+				if (root.subtrees().get(i).subtrees().size() > 0) {
+					ArrayList<TOCTree> strElemList = (ArrayList<TOCTree>) root.subtrees().get(i).subtrees(); // für alle Strukturelemente in jedem Kapitel...
+
+					for (TOCTree toc : strElemList) {
+						String tocStr = toc.getText();
+						String bText = b.getText();
+						if (tocStr.equals(bText)) {
+							strElemList.remove(toc);
+							break;
+						}
+					}
+				}
+			}
+		}
+		myAdapter.notifyDataSetChanged();
+		
+	}
+	
 }

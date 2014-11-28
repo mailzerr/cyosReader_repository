@@ -7,7 +7,7 @@
 <!-- Updated by Matthias Dill 2014/06/10 -->
 <!-- Updated by Matthias Dill 2014/08/11 -->
 <resources>
-	<node name="library" value="FBReader Bibliothek">
+	<node name="library" value="cyosReader Bibliothek">
 		<node name="unknownAuthor" value="Unbekannte Autoren"/>
 		<node name="booksWithNoTags" value="Bücher ohne Schlagwörter"/>
 		<node name="demo" value="Leseprobe"/>
@@ -56,8 +56,8 @@
 		<node name="fileTreeCard" value="Speicherkarte">
 			<node name="summary" value="Speicherkarte (bei einigen Geräten der interne Speicher)"/>
 		</node>
-		<node name="fileTreeLibrary" value="FBReader Bibliothek">
-			<node name="summary" value="FBReader Buchverzeichnis"/>
+		<node name="fileTreeLibrary" value="cyosReader Bibliothek">
+			<node name="summary" value="cyosReader Buchverzeichnis"/>
 		</node>
 		<node name="localSearch" value="Lokale Suche"/>
 		<node name="rescan" value="Neu einlesen"/>
@@ -255,7 +255,7 @@
 		<node name="returnTo" value="Zurück zu…"/>
 		<node name="back" value="Zurück"/>
 		<node name="forward" value="Vorwärts"/>
-		<node name="close" value="FBReader schließen"/>
+		<node name="close" value="cyosReader schließen"/>
 	</node>
 	<node name="style" value="Strukturelement %s"/>
 	<node name="highlightingStyleMenu">
@@ -790,12 +790,12 @@
 				<node name="summaryOff" value="Zeige keine Liste der letzten Positionen"/>
 			</node>
 			<node name="backKeyAction" value="Aktion für die Zurück-Taste">
-				<node name="exit" value="FBReader schließen"/>
+				<node name="exit" value="cyosReader schließen"/>
 				<node name="goBack" value="Zurück navigieren"/>
 				<node name="cancelMenu" value="Zurück-Menü anzeigen"/>
 			</node>
 			<node name="backKeyLongPressAction" value="Aktion beim langen Drücken der Zurück-Taste">
-				<node name="exit" value="FBReader schließen"/>
+				<node name="exit" value="cyosReader schließen"/>
 				<node name="goBack" value="Zurück navigieren"/>
 				<node name="cancelMenu" value="Zurück-Menü anzeigen"/>
 				<node name="none" value="Keine Aktion"/>
@@ -923,7 +923,7 @@
 			<node name="register" value="Anmelden"/>
 		</node>
 		<node name="CustomCatalogDialog">
-			<node name="title" value="FBReader: eigenen Katalog hinzufügen"/>
+			<node name="title" value="cyosReader: eigenen Katalog hinzufügen"/>
 			<node name="catalogTitle" value="Titel"/>
 			<node name="catalogUrl" value="URL"/>
 			<node name="catalogSummary" value="Zusammenfassung"/>
@@ -941,12 +941,12 @@
 		</node>
 		<node name="tips">
 			<node name="title" value="Hinweis des Tages"/>
-			<node name="initializationText" value="Möchten die täglich Hinweise zum FBReader erhalten? Neue Hinweise würden von der FBReader-Web-Site heruntergeladen. Das voraussichtliche Datenvolumen beträgt 1-2 kB pro Woche.&#10;&#10;Hinweise aktivieren?"/>
+			<node name="initializationText" value="Möchten die täglich Hinweise zum cyosReader erhalten?"/>
 			<node name="dontShowAgain" value="Nicht mehr anzeigen"/>
 			<node name="more" value="Nächster Hinweis"/>
 		</node>
 		<node name="screenHint">
-			<node name="message1" value="Standardmäßig arbeitet FBReader im Vollbildmodus. Berühren sie das mittlere Drittel des Bildschirm um die Bedienflächen anzuzeigen. Dieses Verhalten kann in den Einstellungen unter “Aussehen” angepasst werden."/>
+			<node name="message1" value="Standardmäßig arbeitet cyosReader im Vollbildmodus. Berühren sie das mittlere Drittel des Bildschirm um die Bedienflächen anzuzeigen. Dieses Verhalten kann in den Einstellungen unter “Aussehen” angepasst werden."/>
 			<node name="message2" value="Sehr gut! Berühren sie nun wieder das mittlere Drittel, um die Bedienflächen und den Hinweis zu vertecken. Wenn sie während des Lesens die Bedienflächen immer anzeigen wollen, wählen sie in den Einstellungen unter “Aussehen” den Punkt “Aktionsleiste im Lesemodus anzeigen”."/>
 		</node>
 		<node name="folderList">
@@ -998,7 +998,7 @@
 		<node name="pluginNotFound" value="Kein Plugin für '%s'"/>
 		<node name="unknownPluginType" value="Unbekannter Plugin-Typ: %s"/>
 		<node name="fileNotFound" value="Datei nicht gefunden: %s"/>
-		<node name="unsupportedEncryptionMethod" value="Die Verschlüsselung der Datei %s wird von FBReader nicht unterstützt. Einige Seiten können nicht gelesen werden."/>
+		<node name="unsupportedEncryptionMethod" value="Die Verschlüsselung der Datei %s wird von cyosReader nicht unterstützt. Einige Seiten können nicht gelesen werden."/>
 		<node name="opfFileNotFound" value="OPF in %s nicht gefunden"/>
 		<node name="unsupportedFileFormat" value="Dateiformat für '%s' wird nicht unterstützt"/>
 		<node name="errorParsingRtf" value="Rtf-Parsing Fehler in: %s"/>
@@ -1024,17 +1024,17 @@
 	</node>
 	<node name="crash">
 		<node name="fixBooksDirectory">
-			<node name="title" value="FBReader Problem"/>
-			<node name="text" value="Auf das FBReader Cache-Verzeichnis kann nicht schreibend zugegriffen werden. Möglicherweise haben sie ihre Speicherkarte entfernt oder sie ist nicht im Zugriff des Android-Systems. Bitte beheben sie das Problem oder geben Sie unten einen anderen Verzeichnisnamen ein."/>
+			<node name="title" value="cyosReader Problem"/>
+			<node name="text" value="Auf das cyosReader Cache-Verzeichnis kann nicht schreibend zugegriffen werden. Möglicherweise haben sie ihre Speicherkarte entfernt oder sie ist nicht im Zugriff des Android-Systems. Bitte beheben sie das Problem oder geben Sie unten einen anderen Verzeichnisnamen ein."/>
 		</node>
 		<node name="missingNativeLibrary">
-			<node name="title" value="FBReader Problem"/>
-			<node name="text" value="FBReader kann die eigene Bibliothek nicht laden. Möglicherweise ist sie nicht korrekt installiert. Wenn das Problem weiterhin besteht, versuchen Sie bitte FBreader neu zu installieren."/>
+			<node name="title" value="cyosReader Problem"/>
+			<node name="text" value="cyosReader kann die eigene Bibliothek nicht laden. Möglicherweise ist sie nicht korrekt installiert. Wenn das Problem weiterhin besteht, versuchen Sie bitte cyosReader neu zu installieren."/>
 		</node>
 	</node>
 	<node name="error">
 		<node name="bookReading">
-			<node name="title" value="FBReader Problem"/>
+			<node name="title" value="cyosReader Problem"/>
 		</node>
 	</node>
 	<node name="links">
