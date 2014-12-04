@@ -240,7 +240,6 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 							// see http://androidsnippets.com/prompt-user-input-with-an-alertdialog
 							///////////////////////////////
 */
-							myFragment.saveStructureElement(myBookmark, "TEST");
 							myFragment.update();
 						}
 					} else {

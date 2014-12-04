@@ -19,9 +19,13 @@
 
 package org.geometerplus.android.fbreader.api;
 
-import android.content.Intent;
+import org.geometerplus.fbreader.book.Book;
+import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.book.SerializerUtil;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.zlibrary.core.application.ZLApplication;
 
-import org.geometerplus.fbreader.book.*;
+import android.content.Intent;
 
 public abstract class FBReaderIntents {
 	public static final String DEFAULT_PACKAGE = "org.geometerplus.zlibrary.ui.android";
@@ -55,6 +59,7 @@ public abstract class FBReaderIntents {
 		String BOOKMARK                 = "fbreader.bookmark";
 		String PLUGIN                   = "fbreader.plugin";
 		String TYPE                     = "fbreader.type";
+		String FBREADER					= "fbreader.activity";
 	}
 
 	public static Intent defaultInternalIntent(String action) {

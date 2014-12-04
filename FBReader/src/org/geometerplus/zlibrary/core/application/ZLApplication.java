@@ -30,7 +30,7 @@ public abstract class ZLApplication {
 		return ourInstance;
 	}
 
-	private static ZLApplication ourInstance;
+	public static ZLApplication ourInstance;
 
 	public static final String NoAction = "none";
 

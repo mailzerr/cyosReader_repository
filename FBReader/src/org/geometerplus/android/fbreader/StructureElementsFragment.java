@@ -13,10 +13,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
+import org.geometerplus.android.fbreader.libraryService.SQLiteBooksDatabase;
 import org.geometerplus.android.util.ViewUtil;
 import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.book.BookmarkQuery;
 import org.geometerplus.fbreader.book.SerializerUtil;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
+import org.geometerplus.fbreader.fbreader.BookmarkHighlighting;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
@@ -28,11 +32,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,13 +64,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		oder: http://stackoverflow.com/questions/13680919/saving-listview-state-before-replacing-the-fragment
 		super.onSaveInstanceState(outState);
 	}
-/*
-	public void restoreStructureElement(Bookmark b, String structElemName){
-		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-		fbreader.Collection.saveBookmark(b);
-		saveStructureElement(b, structElemName);
-	}
-	*/
+	
 	public void saveStructureElement(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		
@@ -114,7 +113,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		myAdapter.notifyDataSetChanged();
 		return;
 	}
-	
+	 
 	public void saveStructureElementImproved(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		TOCTree treeToSelect = null;
@@ -136,7 +135,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		// Wenn subtree leer ist: als erstes Element einfügen
 		if(subtrees.isEmpty()) {
 			TOCTree toc = new TOCTree(treeToSelect);
-			toc.setText("testik");//b.getText());
+			toc.setText(b.getText()); //"testik");
 
 			if (toc.getReference() == null) {
 				toc.setReference(null, b.ParagraphIndex);
@@ -154,7 +153,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				// richtige Einfügeposition gefunden: einfügen
 				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
 															// damit man die Einfügepopsition auch übergeben kann
-				toc.setText("testik");//b.getText());b.getText());
+				toc.setText(b.getText());//"testik");
 				if (toc.getReference() == null) {
 					toc.setReference(null, b.ParagraphIndex);
 				}
@@ -172,7 +171,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	// Beispiel: ich möchte alle Zitate unter einen Hut bringen und setze als Elternelement einen bestimmten Knoten.
 
 	// GUTE IDEE: Im Strukturbereich die Kommentare zum Strukturelement
-	// anbringen: als Kind dem TOC-Objekt des Strukturelements
+	// anbringen: als Kind dem TOC-Objekt des Strukturelements 
 	// hinzufügen! evtl. ein Bild auch..
 	// und das Padding auf der gleichen Ebene wie das Strukturelement	
 ////////////////////////////////////////////////////
@@ -197,6 +196,28 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
+			
+			// get sharedPreferences
+			SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
+			String path = sharedPreferences.getString("pathToInsert", "");
+			String choice = sharedPreferences.getString("choice", "");
+			//löschen nach dem Auslesen
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString("pathToInsert", "");
+			editor.putString("choice", "");
+			
+			editor.commit();
+			
+			if(!path.isEmpty()){
+				try {
+					importStructureElementsFromFile(path, choice);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			// end shared Preferences
 			
 			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
 			final TOCTree root = fbreader.Model.TOCTree;
@@ -228,27 +249,9 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					}
 				}
 			}
-	
-			//holen von zuvor allen gespeicherten Strukturelementen um sie im Strukturbereich anzuzeigen:
-//			List<Bookmark> oldElements = fbreader.getVisibleBookmarks();
-//			if (oldElementsLoaded == false && !oldElements.isEmpty()) {
-//				oldElementsLoaded = true; // garantieren, dass der Code unten nur ein Mal ausgeführt wird (alte Lesezeichen geholt werden)
-//				
-//				Activity act = (Activity) fbreader.getMyWindow(); 
-//				FragmentManager fm = act.getFragmentManager();
-//				StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
-//				if(myFragment != null) {
-//					for(Bookmark b : oldElements) {
-////						myFragment.restoreStructureElement(b, "restored");
-//						myFragment.saveStructureElement(b, "old_bookmarks");
-//					}
-//				}
-//			}
 		}
 	}
 	
-	
-
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
@@ -327,8 +330,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					: 0);
 
 			setIcon(ViewUtil.findImageView(view, R.id.toc_tree_item_icon), tree);
-			//test: Anzeigetext abkürzen
 			
+			// Anzeigetext abkürzen
 			String textToShow = "";
 			if (tree.getText().length() > 30) {
 				textToShow = tree.getText().substring(0, 30) + "..";
@@ -336,7 +339,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				textToShow = tree.getText();
 			}
 			ViewUtil.findTextView(view, R.id.toc_tree_item_text).setText(textToShow);
-			//end test Anzeigetext abkürzen
+			// Anzeigetext abkürzen
 			//ViewUtil.findTextView(view, R.id.toc_tree_item_text).setText(tree.getText());
 			return view;
 		}
@@ -422,7 +425,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				anim.start();
 			}
 		}
-		
 		if (v.getId() == R.id.decrease) {
 				final View view = getActivity().findViewById(R.id.fragment_container);
 				int mWidth = view.getWidth();
@@ -484,21 +486,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	}
 
 	
-//	// UNUSED METHOD
-//	public void restoreStructureElementsFromDB() {
-//	 	final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-////		Activity act = (Activity) fbreader.getMyWindow();
-////		FragmentManager fm = act.getFragmentManager();
-//		StructureElementsFragment myFragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
-//
-//		List<Bookmark> myLiskkt = fbreader.getVisibleBookmarks();
-//		if (myLiskkt != null && myFragment != null) {
-//			for (Bookmark b : myLiskkt) {
-//				myFragment.saveStructureElement(b, "TESTTEST");
-//			}
-//		}
-//	}
-	
 	public void exportStructureElementsToFile() throws IOException {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		
@@ -531,10 +518,10 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			for(String s : serializedBookmarks) {
 				myOutWriter.append(s + ",_,_,_,_,"); // Trennzeichen für die Bookmarks, um sie später mit RegEx zu splitten
 			}
-			
+		
 			myOutWriter.close();
 			fout.close();
-			
+		
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -552,20 +539,15 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			}
 		});
 		ad.show();
-
 //DIALOG TEST END
-//		test:
-//		String tempPath = "/storage/emulated/0/Books" + "/" + exportedFileName;
-//		importStructureElementsFromFile(tempPath);
 	}
 	
-	public void importStructureElementsFromFile(String pathToOpen) throws IOException{
+	public void importStructureElementsFromFile(String pathToOpen, String mode) throws IOException {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		List<String> readedStrElem = new ArrayList<String>();
 		String[] strArray;
 		
 		//File einlesen:
-//		File myFile = new File(pathToOpen);
 		File myFile = new File(pathToOpen);
 		FileInputStream fInput = new FileInputStream(myFile);
 		BufferedReader myBufReader = new BufferedReader(new InputStreamReader(fInput));
@@ -586,19 +568,48 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		//////////////////////
 
 		List<Bookmark> importedBookmarks = SerializerUtil.deserializeBookmarkList(readedStrElem);
+		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		
 		if(importedBookmarks.isEmpty()) {
 			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG).show();
 			return;
 		}
 		
-		//find duplicate and erase them from importedBookmarks list:
-		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		if(mode.equalsIgnoreCase("overwrite")){
+			//fbreader.eraseVisibleBookmarks();
+			SQLiteBooksDatabase DBconn = new SQLiteBooksDatabase(getActivity());
+			for(Bookmark b : bookmarks) {
+				DBconn.deleteBookmark(b);
+				deleteStructureElement(b);
+			}
+			myAdapter = new TOCAdapter(fbreader.Model.TOCTree);
+			
+			myAdapter.notifyDataSetChanged();
+		}
+
+		//find duplicates and delete them from importedBookmarks list:
 		importedBookmarks.removeAll(bookmarks); // löscht Duplikate aus bereits vorhandenen Bookmarks
+
+
+//		SQLiteDatabase myDB = getActivity().openOrCreateDatabase("books.db", Context.MODE_PRIVATE, null);
+		SQLiteBooksDatabase mySuperDB = new SQLiteBooksDatabase(getActivity());
+		for(Bookmark b : importedBookmarks) {
+			b.setId(-1); // to start insert action instead update
+			mySuperDB.saveBookmark(b);
+			fbreader.getTextView().addHighlighting(new BookmarkHighlighting(fbreader.getTextView(), fbreader.Collection, b));
+			fbreader.saveImportedBookmarks(importedBookmarks);
+			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
+		}
+
+		// ACHTUNG: "public" zurück auf protected in der Klasse SQLiteBooksDatabase weg machen und DB zeug selber schreiben!! bessere Kapselung USW!!
+		// hier der Code von saveBookmark einfügen SQL (statement build proces
+
 		if( !importedBookmarks.isEmpty() ){
 			for(Bookmark b : importedBookmarks){
-				fbreader.Collection.saveBookmark(b);//TESTEN!!!!!! update des Strukturbereichs erfolgt in der onREsume() des Fragments
-			}
-		}
+				saveStructureElementImproved(b, "imported"); // speichern im Strukturbereich
+				fbreader.Collection.saveBookmark(b);
+				
+			}		}		myAdapter.notifyDataSetChanged();
 	}
 	
 	public void update() {
@@ -628,7 +639,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			}
 		}
 		myAdapter.notifyDataSetChanged();
-		
 	}
 	
 }

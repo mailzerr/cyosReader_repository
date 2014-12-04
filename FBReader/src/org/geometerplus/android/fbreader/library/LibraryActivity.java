@@ -19,25 +19,33 @@
 
 package org.geometerplus.android.fbreader.library;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.*;
 import android.os.Bundle;
+import android.preference.PreferenceManager.OnActivityResultListener;
+import android.provider.BaseColumns;
 import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.options.ZLStringOption;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
-
 import org.geometerplus.zlibrary.ui.android.R;
-
 import org.geometerplus.fbreader.book.*;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
 import org.geometerplus.fbreader.library.*;
 import org.geometerplus.fbreader.tree.FBTree;
-
 import org.geometerplus.android.util.*;
 import org.geometerplus.android.fbreader.*;
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
@@ -126,9 +134,78 @@ public class LibraryActivity extends TreeActivity<LibraryTree> implements MenuIt
 	// show BookInfoActivity
 	//
 	private void showBookInfo(Book book) {
-		final Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
-		FBReaderIntents.putBookExtra(intent, book);
-		OrientationUtil.startActivity(this, intent);
+		// LAST EDIT
+		final String path = book.File.getPath(); 
+		String fileExtension = path.substring(path.length() - 3, path.length());
+		if(fileExtension.equalsIgnoreCase("txt"))
+		{ // File mit Strukturelementen
+			///////////
+			//USER DIALOG START Quelle: http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Strukturelemente importieren");
+//			alert.setTitle("Path:" + book.File.getPath());
+			alert.setMessage("Bitte wählen Sie die gewünschte Option aus: " + "endung:" + fileExtension);
+			
+			alert.setNegativeButton("Elemente überschreiben", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					SharedPreferences sharedPreferences = getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					editor.putString("pathToInsert", path.toString());
+					editor.putString("choice", "overwrite");
+					editor.commit();
+					finish();
+				}
+			});
+
+			alert.setNeutralButton("Elemente zusammenfügen", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					SharedPreferences sharedPreferences = getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					editor.putString("pathToInsert", path.toString());
+					editor.putString("choice", "merge");
+					editor.commit();
+					finish();
+				}
+			});
+			
+			alert.setPositiveButton("Abbrechen", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+			  // close the running activity
+				SharedPreferences sharedPreferences = getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
+				SharedPreferences.Editor editor = sharedPreferences.edit();
+				editor.putString("pathToInsert", "");
+				editor.putString("choice", "");
+				editor.commit();
+				finish();
+			  }
+			});
+
+			alert.show();
+			//USER DIALOG END
+			///////////
+			
+			/*
+			SharedPreferences sharedPreferences = getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString("pathToInsert", path.toString());
+			editor.commit();
+			finish();
+			*/
+			
+			/*//Versuch mit Intents
+			Intent returnIntent = new Intent();
+			returnIntent.putExtra("path", path);
+			setResult(RESULT_OK, returnIntent);
+			finishActivity(558);*/
+		}
+		else
+		{
+			final Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
+			FBReaderIntents.putBookExtra(intent, book);
+			OrientationUtil.startActivity(this, intent);	
+		}
+		
 	}
 
 	//

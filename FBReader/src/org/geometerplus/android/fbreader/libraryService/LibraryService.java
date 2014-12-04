@@ -44,7 +44,7 @@ import org.geometerplus.fbreader.book.*;
 import org.geometerplus.android.fbreader.util.AndroidImageSynchronizer;
 
 public class LibraryService extends Service {
-	private static SQLiteBooksDatabase ourDatabase;
+	public static SQLiteBooksDatabase ourDatabase;
 	private static final Object ourDatabaseLock = new Object();
 
 	static final String BOOK_EVENT_ACTION = "fbreader.library_service.book_event";

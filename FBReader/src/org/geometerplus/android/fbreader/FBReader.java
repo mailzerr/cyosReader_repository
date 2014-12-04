@@ -19,25 +19,37 @@
 
 package org.geometerplus.android.fbreader;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Struct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.app.SearchManager;
-import android.content.*;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.*;
-import android.view.*;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-
-import org.geometerplus.zlibrary.core.application.ZLApplication;
+import org.geometerplus.android.fbreader.api.ApiListener;
+import org.geometerplus.android.fbreader.api.ApiServerImplementation;
+import org.geometerplus.android.fbreader.api.FBReaderIntents;
+import org.geometerplus.android.fbreader.api.MenuNode;
+import org.geometerplus.android.fbreader.api.PluginApi;
+import org.geometerplus.android.fbreader.formatPlugin.PluginUtil;
+import org.geometerplus.android.fbreader.httpd.DataService;
+import org.geometerplus.android.fbreader.library.LibraryActivity;
+import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
+import org.geometerplus.android.fbreader.sync.SyncOperations;
+import org.geometerplus.android.fbreader.tips.TipsActivity;
+import org.geometerplus.android.util.DeviceType;
+import org.geometerplus.android.util.SearchDialogUtil;
+import org.geometerplus.android.util.UIUtil;
+import org.geometerplus.fbreader.book.Book;
+import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.bookmodel.BookModel;
+import org.geometerplus.fbreader.fbreader.ActionCode;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.fbreader.fbreader.options.CancelMenuHelper;
+import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
+import org.geometerplus.fbreader.tips.TipsManager;
 import org.geometerplus.zlibrary.core.application.ZLApplicationWindow;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.library.ZLibrary;
@@ -47,28 +59,39 @@ import org.geometerplus.zlibrary.core.view.ZLViewWidget;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.ui.android.R;
 import org.geometerplus.zlibrary.ui.android.error.ErrorKeys;
-import org.geometerplus.zlibrary.ui.android.library.*;
+import org.geometerplus.zlibrary.ui.android.library.UncaughtExceptionHandler;
+import org.geometerplus.zlibrary.ui.android.library.ZLAndroidApplication;
+import org.geometerplus.zlibrary.ui.android.library.ZLAndroidLibrary;
 import org.geometerplus.zlibrary.ui.android.view.AndroidFontUtil;
 import org.geometerplus.zlibrary.ui.android.view.ZLAndroidWidget;
-import org.geometerplus.fbreader.book.*;
-import org.geometerplus.fbreader.bookmodel.BookModel;
-import org.geometerplus.fbreader.bookmodel.TOCTree;
-import org.geometerplus.fbreader.fbreader.*;
-import org.geometerplus.fbreader.fbreader.options.CancelMenuHelper;
-import org.geometerplus.fbreader.formats.ExternalFormatPlugin;
-import org.geometerplus.fbreader.tips.TipsManager;
-import org.geometerplus.android.fbreader.api.*;
-import org.geometerplus.android.fbreader.formatPlugin.PluginUtil;
-import org.geometerplus.android.fbreader.httpd.DataService;
-import org.geometerplus.android.fbreader.library.BookInfoActivity;
-import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
-import org.geometerplus.android.fbreader.sync.SyncOperations;
-import org.geometerplus.android.fbreader.tips.TipsActivity;
-import org.geometerplus.android.util.*;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 public final class FBReader extends Activity implements ZLApplicationWindow{
 	static final int ACTION_BAR_COLOR = Color.DKGRAY;
 
+	public static String pathToInsert;
+	
 	public static final int REQUEST_PREFERENCES = 1;
 	public static final int REQUEST_CANCEL_MENU = 2;
 
@@ -225,11 +248,6 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		transaction.addToBackStack("StructureElementsFragment");
 		transaction.commit();
 		// end new stuff
-		
-		//new stuff: adding buttons to action bar
-		
-		//new stuff: adding buttons to action bar
-		
 		
 		bindService(
 			new Intent(this, DataService.class),
@@ -616,9 +634,27 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 				}
 			});
 		}
-
+		
 		PopupPanel.restoreVisibilities(myFBReaderApp);
 		ApiServerImplementation.sendEvent(this, ApiListener.EVENT_READ_MODE_OPENED);
+		//TODO
+		// TEST : get the import file path from a LibraryActivity
+		// idea from here: http://stackoverflow.com/questions/10407159/how-to-manage-start-activity-for-result-on-android
+//		Intent i = new Intent(FBReader.this, LibraryActivity.class);
+//		startActivityForResult(i, 1);
+		/*if (pathToInsert != null){
+			if(!FBReader.pathToInsert.isEmpty()){
+				StructureElementsFragment fragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
+				try {
+					fragment.importStructureElementsFromFile(FBReader.pathToInsert, "overwrite");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		*/
+		// END TEST
 	}
 
 	@Override
@@ -714,6 +750,26 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode,resultCode,data);
+		
+//	    if (requestCode == 1) {
+//	        if(!FBReader.pathToInsert.isEmpty()) {
+////	            String path=data.getStringExtra("path");
+//	        	String path = FBReader.pathToInsert;
+//	        	FBReader.pathToInsert = "";
+//	            try {
+//					StructureElementsFragment fragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
+//					fragment.importStructureElementsFromFile(path, "overwrite");
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//	        }
+//	        if (resultCode == 0) {
+//	            //Write your code if there's no result
+//	        }
+//	    }
+	    
 		switch (requestCode) {
 			case REQUEST_PREFERENCES:
 				if (resultCode != RESULT_DO_NOTHING && data != null) {
@@ -956,7 +1012,7 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		return (level >= 0) ? level : 50;
 	}
 
-	private BookCollectionShadow getCollection() {
+	public BookCollectionShadow getCollection() {
 		return (BookCollectionShadow)myFBReaderApp.Collection;
 	}
 
@@ -1005,6 +1061,7 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 			}
 		};
 
+		
 	@Override
 	public void refresh() {
 		runOnUiThread(new Runnable() {
@@ -1074,4 +1131,5 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 			myFBReaderApp.useSyncInfo(myResumeTimestamp + 10 * 1000 > System.currentTimeMillis());
 		}
 	};
+	
 }

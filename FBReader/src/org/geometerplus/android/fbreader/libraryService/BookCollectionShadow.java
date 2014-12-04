@@ -28,14 +28,10 @@ import android.os.RemoteException;
 import org.geometerplus.zlibrary.core.filesystem.ZLFile;
 import org.geometerplus.zlibrary.core.image.ZLImage;
 import org.geometerplus.zlibrary.core.options.Config;
-
 import org.geometerplus.zlibrary.text.view.ZLTextFixedPosition;
 import org.geometerplus.zlibrary.text.view.ZLTextPosition;
-
 import org.geometerplus.zlibrary.ui.android.image.ZLBitmapImage;
-
 import org.geometerplus.fbreader.book.*;
-
 import org.geometerplus.android.fbreader.api.FBReaderIntents;
 
 public class BookCollectionShadow extends AbstractBookCollection implements ServiceConnection {
@@ -436,6 +432,19 @@ public class BookCollectionShadow extends AbstractBookCollection implements Serv
 			try {
 				myInterface.deleteBookmark(SerializerUtil.serialize(bookmark));
 			} catch (RemoteException e) {
+			}
+		}
+	}
+	
+	public synchronized void deleteAllBookmarks(Book book){
+		if(myInterface != null){
+			ArrayList<Bookmark> thisBookBookmarks;
+			for (BookmarkQuery query = new BookmarkQuery(book, 20); ; query = query.next()) {
+				thisBookBookmarks = (ArrayList<Bookmark>) bookmarks(query);
+				while(!thisBookBookmarks.isEmpty()){
+					deleteBookmark(thisBookBookmarks.get(0)); //remove from book
+					thisBookBookmarks.remove(0); //remove fro collection
+				}
 			}
 		}
 	}

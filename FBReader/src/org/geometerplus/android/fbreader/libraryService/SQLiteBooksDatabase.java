@@ -40,12 +40,12 @@ import org.geometerplus.fbreader.book.*;
 
 import org.geometerplus.android.util.SQLiteUtil;
 
-final class SQLiteBooksDatabase extends BooksDatabase {
+public final class SQLiteBooksDatabase extends BooksDatabase {
 	private final SQLiteDatabase myDatabase;
 	private final HashMap<String,SQLiteStatement> myStatements =
 		new HashMap<String,SQLiteStatement>();
 
-	SQLiteBooksDatabase(Context context) {
+	public SQLiteBooksDatabase(Context context) {
 		myDatabase = context.openOrCreateDatabase("books.db", Context.MODE_PRIVATE, null);
 		migrate();
 	}
@@ -859,7 +859,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
 	}
 
 	@Override
-	protected long saveBookmark(Bookmark bookmark) {
+	public long saveBookmark(Bookmark bookmark) {
 		SQLiteStatement statement;
 		if (bookmark.getId() == -1) {
 			statement = get(
@@ -905,7 +905,7 @@ final class SQLiteBooksDatabase extends BooksDatabase {
 	}
 
 	@Override
-	protected void deleteBookmark(Bookmark bookmark) {
+	public void deleteBookmark(Bookmark bookmark) {
 		final SQLiteStatement statement = get("DELETE FROM Bookmarks WHERE bookmark_id=?");
 		statement.bindLong(1, bookmark.getId());
 		statement.execute();

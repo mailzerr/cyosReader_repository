@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geometerplus.android.fbreader.StructureElementsFragment;
 import org.geometerplus.fbreader.book.Author;
 import org.geometerplus.fbreader.book.Book;
 import org.geometerplus.fbreader.book.BookEvent;
@@ -57,6 +58,8 @@ import org.geometerplus.zlibrary.text.view.ZLTextPosition;
 import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 
 public final class FBReaderApp extends ZLApplication {
@@ -89,7 +92,7 @@ public final class FBReaderApp extends ZLApplication {
 	private Date myJumpTimeStamp;
 
 	public final IBookCollection Collection;
-
+	
 	private SyncData mySyncData = new SyncData();
 
 	public FBReaderApp(IBookCollection collection) {
@@ -275,13 +278,30 @@ public final class FBReaderApp extends ZLApplication {
 	}
 
 	public List<Bookmark> getVisibleBookmarks(){
-		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
+		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 30); ; query = query.next()) {
 			 List<Bookmark> myBookmarks = Collection.bookmarks(query);
 //			 List myBookmarksNEW = Collection.bookmarks(new BookmarkQuery(Model.Book, true, 100));
 			 if (myBookmarks.isEmpty()){
 				 return Collections.emptyList();
 			 }
 			 return myBookmarks;
+		}
+	}
+	
+	// needed for import with overwriting:
+	public void eraseVisibleBookmarks(){
+		List<Bookmark> myBookmarks;
+		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
+			myBookmarks = Collection.bookmarks(query);
+			if(myBookmarks != null) {
+				myBookmarks.clear();
+			}
+		}
+	}
+	//
+	public void saveImportedBookmarks(List <Bookmark> bookmarkList){
+		for(Bookmark b : bookmarkList){
+			Collection.saveBookmark(b);
 		}
 	}
 	
@@ -702,5 +722,20 @@ public final class FBReaderApp extends ZLApplication {
 			clearTextCaches();
 			getViewWidget().repaint();
 		}
+	}
+	
+	public Fragment getStructureElementsFragment(){
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow();
+		FragmentManager fm = act.getFragmentManager();
+		StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+		return myFragment;
+	}
+	
+	public FragmentManager getMyFragmentManager(){
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow();
+		FragmentManager fm = act.getFragmentManager();
+		return fm;
 	}
 }

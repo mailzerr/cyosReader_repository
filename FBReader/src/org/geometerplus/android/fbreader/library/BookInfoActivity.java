@@ -19,9 +19,44 @@
 
 package org.geometerplus.android.fbreader.library;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.android.fbreader.FBReader;
+import org.geometerplus.android.fbreader.OrientationUtil;
+import org.geometerplus.android.fbreader.api.FBReaderIntents;
+import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
+import org.geometerplus.android.fbreader.preferences.EditBookInfoActivity;
+import org.geometerplus.android.fbreader.util.AndroidImageSynchronizer;
+import org.geometerplus.fbreader.book.Author;
+import org.geometerplus.fbreader.book.Book;
+import org.geometerplus.fbreader.book.BookEvent;
+import org.geometerplus.fbreader.book.BookUtil;
+import org.geometerplus.fbreader.book.Bookmark;
+import org.geometerplus.fbreader.book.IBookCollection;
+import org.geometerplus.fbreader.book.SerializerUtil;
+import org.geometerplus.fbreader.book.SeriesInfo;
+import org.geometerplus.fbreader.book.Tag;
+import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.fbreader.network.HtmlUtil;
+import org.geometerplus.zlibrary.core.filesystem.ZLPhysicalFile;
+import org.geometerplus.zlibrary.core.image.ZLImage;
+import org.geometerplus.zlibrary.core.image.ZLImageProxy;
+import org.geometerplus.zlibrary.core.language.Language;
+import org.geometerplus.zlibrary.core.language.ZLLanguageUtil;
+import org.geometerplus.zlibrary.core.resources.ZLResource;
+import org.geometerplus.zlibrary.ui.android.R;
+import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
+import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageManager;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -32,28 +67,11 @@ import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.Window;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import org.geometerplus.zlibrary.core.filesystem.ZLPhysicalFile;
-import org.geometerplus.zlibrary.core.image.ZLImage;
-import org.geometerplus.zlibrary.core.image.ZLImageProxy;
-import org.geometerplus.zlibrary.core.language.Language;
-import org.geometerplus.zlibrary.core.language.ZLLanguageUtil;
-import org.geometerplus.zlibrary.core.resources.ZLResource;
-
-import org.geometerplus.zlibrary.ui.android.R;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageData;
-import org.geometerplus.zlibrary.ui.android.image.ZLAndroidImageManager;
-
-import org.geometerplus.fbreader.book.*;
-import org.geometerplus.fbreader.network.HtmlUtil;
-
-import org.geometerplus.android.fbreader.FBReader;
-import org.geometerplus.android.fbreader.OrientationUtil;
-import org.geometerplus.android.fbreader.api.FBReaderIntents;
-import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
-import org.geometerplus.android.fbreader.preferences.EditBookInfoActivity;
-import org.geometerplus.android.fbreader.util.AndroidImageSynchronizer;
 
 public class BookInfoActivity extends Activity implements IBookCollection.Listener {
 	private static final boolean ENABLE_EXTENDED_FILE_INFO = false;
@@ -66,7 +84,7 @@ public class BookInfoActivity extends Activity implements IBookCollection.Listen
 
 	private final AndroidImageSynchronizer myImageSynchronizer = new AndroidImageSynchronizer(this);
 
-	private final BookCollectionShadow myCollection = new BookCollectionShadow();
+	private BookCollectionShadow myCollection = new BookCollectionShadow();
 
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -78,17 +96,61 @@ public class BookInfoActivity extends Activity implements IBookCollection.Listen
 		final Intent intent = getIntent();
 		myDontReloadBook = intent.getBooleanExtra(FROM_READING_MODE_KEY, false);
 		myBook = FBReaderIntents.getBookExtra(intent);
-
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.book_info);
 	}
 
+	private void importStructureElements(String pathToOpen, String mode) throws IOException{
+		List<String> readedStrElem = new ArrayList<String>();
+		String[] strArray;
+		
+		//File einlesen:
+		File myFile = new File(pathToOpen);
+		FileInputStream fInput = new FileInputStream(myFile);
+		BufferedReader myBufReader = new BufferedReader(new InputStreamReader(fInput));
+		String aDataRow = "";
+		String aBuffer = "";
+		while ((aDataRow = myBufReader.readLine()) != null) {
+			aBuffer += aDataRow;
+		}
+		if(aBuffer.length() > 0) {
+			strArray = aBuffer.split(",_,_,_,_,"); // regular Expression!
+			for( String s : strArray){
+				if(s.length() > 10) {
+					readedStrElem.add(s);
+				}
+			}
+		}
+		myBufReader.close();
+		//////////////////////
+		
+		
+		List<Bookmark> importedBookmarks = SerializerUtil.deserializeBookmarkList(readedStrElem);
+		if(importedBookmarks.isEmpty()) {
+			finish();
+			return;
+		}
+		
+		if(mode.equalsIgnoreCase("overwrite"))
+		{
+			myCollection.deleteAllBookmarks(myBook);
+//			FBReaderApp.Instance().runAction(actionId, params);
+		}
+//		 weiter in beiden Fällen: 
+//		"overwrite": keine Lesezeichen
+//		"merge": Lesezeichen verschmelzen
+		for(Bookmark b : importedBookmarks){
+			myCollection.saveBookmark(b);
+		}
+		//TODO Meldung, wie viele Bookmarks importiert wurden:
+		//FBReader.openBookActivity(BookInfoActivity.this, myBook, null);
+	}
+
+	
 	@Override
 	protected void onStart() {
 		super.onStart();
-
 		OrientationUtil.setOrientation(this, getIntent());
-
 		if (myBook != null) {
 			// we do force language & encoding detection
 			myBook.getEncoding();
@@ -98,23 +160,90 @@ public class BookInfoActivity extends Activity implements IBookCollection.Listen
 			setupAnnotation(myBook);
 			setupFileInfo(myBook);
 		}
-
-		setupButton(R.id.book_info_button_open, "openBook", new View.OnClickListener() {
-			public void onClick(View view) {
-				if (myDontReloadBook) {
-					finish();
-				} else {
-					FBReader.openBookActivity(BookInfoActivity.this, myBook, null);
-				}
+		
+		String path = myBook.File.getPath(); 
+		String fileExtension = path.substring(path.length() - 3, path.length());
+		
+		// // Wenn es sich um eine Datei mit Strukturelementen handelt (.txt) später: TODO .CYOS!!! 
+		if(fileExtension.equalsIgnoreCase("txt")) {
+			
+			//testsuite:
+			try {
+				importStructureElements(myBook.File.getPath(), "overwrite");
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
-		});
+			//end testsuite:
+			
+			/*
+			//USER DIALOG START Quelle: http://www.androidsnippets.com/prompt-user-input-with-an-alertdialog
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+//			alert.setTitle("Strukturelemente importieren");
+			alert.setTitle("Path:" + myBook.File.getPath());
+			alert.setMessage("Bitte wählen Sie die gewünschte Option aus: " + "endung:" + fileExtension);
+			
+			alert.setNegativeButton("Elemente überschreiben", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					try {
+						importStructureElements(myBook.File.getPath(), "overwrite");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					finish();
+				}
+			});
+
+			alert.setNeutralButton("Elemente zusammenfügen", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+					FragmentManager fm = fbreader.getMyFragmentManager();
+					StructureElementsFragment myFragmentchik = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+					if (myFragmentchik != null) {
+						try {
+							myFragmentchik.importStructureElementsFromFile(myBook.File.getPath(), "overwrite");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						myFragmentchik.update();
+					}
+					finish();
+				}
+			});
+			
+			alert.setPositiveButton("Abbrechen", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+			  // close the running activity
+				finish();
+			  }
+			});
+
+			alert.show();
+			//USER DIALOG END
+			
+			*/
+			
+		}
+		else {
+			setupButton(R.id.book_info_button_open, "openBook", new View.OnClickListener() {
+				public void onClick(View view) {
+					if (myDontReloadBook) {
+						finish();
+					} else {
+						FBReader.openBookActivity(BookInfoActivity.this, myBook, null);
+					}
+				}
+			});
+		}
+		
 		setupButton(R.id.book_info_button_edit, "editInfo", new View.OnClickListener() {
 			public void onClick(View view) {
 				final Intent intent =
 					new Intent(getApplicationContext(), EditBookInfoActivity.class);
 				FBReaderIntents.putBookExtra(intent, myBook);
 				OrientationUtil.startActivity(BookInfoActivity.this, intent);
-			}
+			} 
 		});
 		setupButton(R.id.book_info_button_reload, "reloadInfo", new View.OnClickListener() {
 			public void onClick(View view) {
@@ -232,7 +361,6 @@ public class BookInfoActivity extends Activity implements IBookCollection.Listen
 
 	private void setupBookInfo(Book book) {
 		((TextView)findViewById(R.id.book_info_title)).setText(myResource.getResource("bookInfo").getValue());
-
 		setupInfoPair(R.id.book_title, "title", book.getTitle());
 
 		final StringBuilder buffer = new StringBuilder();

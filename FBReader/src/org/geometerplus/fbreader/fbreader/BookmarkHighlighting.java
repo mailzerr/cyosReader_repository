@@ -42,7 +42,7 @@ public final class BookmarkHighlighting extends ZLTextSimpleHighlighting {
 		return bookmark;
 	}
 
-	BookmarkHighlighting(ZLTextView view, IBookCollection collection, Bookmark bookmark) {
+	public BookmarkHighlighting(ZLTextView view, IBookCollection collection, Bookmark bookmark) {
 		super(view, startPosition(bookmark), endPosition(bookmark));
 		Collection = collection;
 		Bookmark = bookmark;

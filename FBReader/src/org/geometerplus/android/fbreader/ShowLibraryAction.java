@@ -54,6 +54,8 @@ class ShowLibraryAction extends FBAndroidAction {
 		if (Reader.Model != null) {
 			FBReaderIntents.putBookExtra(intent, Reader.getCurrentBook());
 		}
+		
+		
 		OrientationUtil.startActivity(BaseActivity, intent);
 	}
 }
