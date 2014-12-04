@@ -287,18 +287,7 @@ public final class FBReaderApp extends ZLApplication {
 			 return myBookmarks;
 		}
 	}
-	
-	// needed for import with overwriting:
-	public void eraseVisibleBookmarks(){
-		List<Bookmark> myBookmarks;
-		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 20); ; query = query.next()) {
-			myBookmarks = Collection.bookmarks(query);
-			if(myBookmarks != null) {
-				myBookmarks.clear();
-			}
-		}
-	}
-	//
+
 	public void saveImportedBookmarks(List <Bookmark> bookmarkList){
 		for(Bookmark b : bookmarkList){
 			Collection.saveBookmark(b);

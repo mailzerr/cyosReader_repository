@@ -13,11 +13,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.geometerplus.android.fbreader.libraryService.BookCollectionShadow;
 import org.geometerplus.android.fbreader.libraryService.SQLiteBooksDatabase;
 import org.geometerplus.android.util.ViewUtil;
 import org.geometerplus.fbreader.book.Bookmark;
-import org.geometerplus.fbreader.book.BookmarkQuery;
 import org.geometerplus.fbreader.book.SerializerUtil;
 import org.geometerplus.fbreader.bookmodel.TOCTree;
 import org.geometerplus.fbreader.fbreader.BookmarkHighlighting;
@@ -36,7 +34,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -64,7 +61,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		oder: http://stackoverflow.com/questions/13680919/saving-listview-state-before-replacing-the-fragment
 		super.onSaveInstanceState(outState);
 	}
-	
+	/*
 	public void saveStructureElement(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		
@@ -112,7 +109,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		//informiere den Adapter über die Änderungen
 //		myAdapter.notifyDataSetChanged();
 		return;
-	}
+	}*/
 	 
 	public void saveStructureElementImproved(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
@@ -135,7 +132,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		// Wenn subtree leer ist: als erstes Element einfügen
 		if(subtrees.isEmpty()) {
 			TOCTree toc = new TOCTree(treeToSelect);
-			toc.setText(b.getText()); //"testik");
+			toc.setText(b.getText());
 
 			if (toc.getReference() == null) {
 				toc.setReference(null, b.ParagraphIndex);
@@ -153,7 +150,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				// richtige Einfügeposition gefunden: einfügen
 				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
 															// damit man die Einfügepopsition auch übergeben kann
-				toc.setText(b.getText());//"testik");
+				toc.setText(b.getText());
 				if (toc.getReference() == null) {
 					toc.setReference(null, b.ParagraphIndex);
 				}
@@ -581,8 +578,9 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			for(Bookmark b : bookmarks) {
 				DBconn.deleteBookmark(b);
 				deleteStructureElement(b);
+				myAdapter = new TOCAdapter(fbreader.Model.TOCTree);
 			}
-			myAdapter = new TOCAdapter(fbreader.Model.TOCTree);
+			
 			
 			myAdapter.notifyDataSetChanged();
 		}
