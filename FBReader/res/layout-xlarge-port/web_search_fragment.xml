@@ -27,15 +27,31 @@
             android:layout_centerHorizontal="true"
             android:background="@android:color/transparent"
             android:src="@drawable/decrease_port" />
-
-        <ImageButton
-            android:id="@+id/close_websearch"
+        
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="@android:color/transparent"
-            android:src="@drawable/websearch_close" />
+            android:orientation="vertical" >
 
+            <ImageButton
+                android:id="@+id/close_websearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/transparent"
+                android:src="@drawable/websearch_close" />
+
+            <ImageButton
+                android:id="@+id/edit_webSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:background="@android:color/transparent"
+                android:paddingTop="5dp"
+                android:src="@drawable/websearch_edit" />
+        </LinearLayout>
+        
         <ImageButton
             android:id="@+id/increasewebsearch"
             android:layout_width="wrap_content"
@@ -45,6 +61,7 @@
             android:background="@android:color/transparent"
             android:src="@drawable/increase_port" />
 
+        
     </RelativeLayout>
 
 </RelativeLayout>

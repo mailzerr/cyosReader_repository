@@ -61,55 +61,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 //		oder: http://stackoverflow.com/questions/13680919/saving-listview-state-before-replacing-the-fragment
 		super.onSaveInstanceState(outState);
 	}
-	/*
-	public void saveStructureElement(Bookmark b, String structElemName) {
-		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
-		
-		TOCTree treeToSelect = fbreader.getCurrentTOCElement();  //alt (26.11.2014)
-//		TOCTree treeToSelect = fbreader.Model.TOCTree; //neu	
-		
-		// finde die Ebene, wo die Kapitelüberschriften sind:
-		while (treeToSelect.Level > 1) {
-			treeToSelect = treeToSelect.Parent;
-		}
-		// treeToSelect zeigt ab jetzt auf ein TOCElement des richtigen Kapitels (d.h. der Strukturelement befindet sich im treeToSelect)
-		
-		// nun muss man die Einfügeposition im subtree des richtigen Kapitels finden...
-		// (weil ja im Exposse (s.8) steht: "gemäß dem Textverlauf"
-		List<TOCTree> subtrees = treeToSelect.subtrees();
-		
-		// Wenn subtree leer ist: als erstes Element einfügen
-		if(subtrees.isEmpty()) {
-			TOCTree toc = new TOCTree(treeToSelect);
-			toc.setText(b.getText());
-
-			if (toc.getReference() == null) {
-				toc.setReference(null, b.ParagraphIndex);
-			}
-		} else { // sonst solange t.getReference().ParagraphIndex < b.getParagraphIndex()
-			for (int i = 0; i < subtrees.size(); i++) {
-				if (subtrees.get(i).getReference().ParagraphIndex < b.getParagraphIndex()) {
-					if (i != subtrees.size() - 1) {
-						continue;
-					}
-					else {
-						i++;
-					}
-				}
-				// richtige Einfügeposition gefunden: einfügen
-				TOCTree toc = new TOCTree(treeToSelect, i); // in TOCActovity habe ich einen speziellen Konstruktor geschrieben,
-															// damit man die Einfügepopsition auch übergeben kann
-				toc.setText(b.getText());
-				if (toc.getReference() == null) {
-					toc.setReference(null, b.ParagraphIndex);
-				}
-				break;
-			}
-		}
-//		//informiere den Adapter über die Änderungen
-//		myAdapter.notifyDataSetChanged();
-		return;
-	}*/
 	 
 	public void saveStructureElementImproved(Bookmark b, String structElemName) {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();

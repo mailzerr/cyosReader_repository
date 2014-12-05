@@ -6,9 +6,13 @@ import org.geometerplus.zlibrary.ui.android.R;
 
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,8 +21,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.webkit.WebView.FindListener;
+import android.webkit.WebView.FindListener;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 public class WebSearchFragment extends Fragment implements OnClickListener {
 
@@ -32,6 +41,7 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 	ImageButton myBtnIncrease;
 	ImageButton myBtnDecrease;
 	ImageButton myBtnClose; 
+	ImageButton myBtnEdit;
 	
 	public WebSearchFragment(String searchTerm, String userChoice) {
 		super();
@@ -67,31 +77,35 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 		//Java Script einschalten: 
 		myWebView.getSettings().setJavaScriptEnabled(true);
 		myWebView.setWebViewClient(new WebViewClient());
+		
+		//get the current URLs from Shared Preferences
+		SharedPreferences sp_search = getActivity().getSharedPreferences("mySearchURLs", Context.MODE_MULTI_PROCESS);
+		
+		String searchURL = sp_search.getString("search", "http://www.google.com/search?q=");
+		String dictURL =   sp_search.getString("dictionary", "http://www.dict.cc/?s=");
+		String wikiURL =   sp_search.getString("wikipedia", "http://de.wikipedia.org/wiki/");
+		
+		//first initialization
+		SharedPreferences.Editor editor = sp_search.edit();
+		if(searchURL.isEmpty()) {
+			editor.putString("search", "http://www.google.com/search?q=");
+		}
 		// dictionary
 		if (myUserChoice.compareTo("selectionTranslate") == 0) {
-			myWebView.loadUrl("http://www.dict.cc/?s=" + mySearchTerm);
+			myWebView.loadUrl(dictURL + mySearchTerm);
 			return webSearchView;
 		} else if (myUserChoice.compareTo("selectionWikipedia") == 0) {
-			myWebView.loadUrl("http://de.wikipedia.org/wiki/" + mySearchTerm);
+			myWebView.loadUrl(wikiURL + mySearchTerm);
 			return webSearchView;
 		} else if (myUserChoice.compareTo("selectionGoogle") == 0) {
-			myWebView.loadUrl("http://www.google.com/search?q=" + mySearchTerm);
+			myWebView.loadUrl(searchURL + mySearchTerm);
 			return webSearchView;
 		} else {
-			myWebView.setWebViewClient(new AllowWebBrowsingClient());
-			// http://www.google.com/search?q=Tustumena
+			// default action, should never be here
 			myWebView.loadUrl("http://www.google.com/search?q=" + mySearchTerm);
 		}
+		
 		return webSearchView;
-	}
-	
-		private class AllowWebBrowsingClient extends WebViewClient {
-			// damit man im WebFragment weitere Links anklicken kann
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
-				return true;
-			}
 	}
 
 	@Override
@@ -120,6 +134,93 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 			transaction.remove(webFragment);
 			transaction.attach(StructElFrag); // show strElFrag:
 			transaction.commit();
+		}
+		if (v.getId() == R.id.edit_webSearch) {
+			AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+			alert.setTitle("Die URLs für die Websuche ändern:");
+			//alert.setMessage("Andern Sie die URL wie gewünscht:\n");
+			
+			LayoutInflater inflater = getActivity().getLayoutInflater();
+			final View dialogLayout = inflater.inflate(R.layout.web_search_edit_dialog, myWebView, false);
+
+//			final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+//			Activity act = (Activity) fbreader.getMyWindow();
+			
+			alert.setView(dialogLayout); //act.findViewById(R.layout.web_search_fragment)));
+			
+			final EditText search = (EditText) dialogLayout.findViewById(R.id.edit_suchmaschine);
+			final EditText dict =   (EditText) dialogLayout.findViewById(R.id.edit_dictionary);
+			final EditText wiki =   (EditText) dialogLayout.findViewById(R.id.edit_wikipedia);
+			/*
+			final EditText search = (EditText) getActivity().findViewById(R.id.edit_suchmaschine);
+			final EditText dict =   (EditText) getActivity().findViewById(R.id.edit_dictionary);
+			final EditText wiki =   (EditText) getActivity().findViewById(R.id.edit_wikipedia);
+			*/
+			SharedPreferences sp_search = getActivity().getSharedPreferences("mySearchURLs", Context.MODE_MULTI_PROCESS);
+			
+			String searchURL = sp_search.getString("search", "");
+			String dictURL = sp_search.getString("dictionary", "");
+			String wikiURL = sp_search.getString("wikipedia", "");
+			
+			//first initialization
+			SharedPreferences.Editor editor = sp_search.edit();
+			if(searchURL.isEmpty()) {
+				editor.putString("search", "http://www.google.com/search?q=");
+			}
+			else {
+				search.setText(searchURL);
+			}
+			
+			if(dictURL.isEmpty()) {
+				editor.putString("dictionary", "http://www.dict.cc/?s=");
+			}
+			else {
+				dict.setText(dictURL);
+			}
+			
+			if(wikiURL.isEmpty()) {
+				editor.putString("wikipedia", "http://de.wikipedia.org/wiki/");
+			}
+			else {
+				wiki.setText(wikiURL);
+			}
+			
+			
+			editor.commit();
+			
+			alert.setPositiveButton("Speichern", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					SharedPreferences sharedPreferences = getActivity().getSharedPreferences("mySearchURLs", Context.MODE_MULTI_PROCESS);
+					
+					/*final EditText search = (EditText) getActivity().findViewById(R.id.edit_suchmaschine);
+					final EditText dict   = (EditText) getActivity().findViewById(R.id.edit_dictionary);
+					final EditText wiki   = (EditText) getActivity().findViewById(R.id.edit_wikipedia);
+					*/
+					final EditText search = (EditText) dialogLayout.findViewById(R.id.edit_suchmaschine);
+					final EditText dict   = (EditText) dialogLayout.findViewById(R.id.edit_dictionary);
+					final EditText wiki   = (EditText) dialogLayout.findViewById(R.id.edit_wikipedia);
+					
+					
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					editor.putString("search", search.getText().toString());
+					editor.putString("dictionary", dict.getText().toString());
+					editor.putString("wikipedia", wiki.getText().toString());
+					editor.commit();
+					dialog.cancel();
+				}
+			});
+
+			alert.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					dialog.cancel();
+				}
+			});
+			
+			alert.show().getWindow().setLayout(900, 800);
+			//neu ab hier:
+//			AlertDialog alertDialog = alert.create();
+//			alertDialog.getWindow().setLayout(600, 400);
+//			alertDialog.show();
 		}
 		if (v.getId() == R.id.increasewebsearch) {
 			final View view = getActivity().findViewById(R.id.fragment_container);
@@ -256,10 +357,12 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 			myBtnIncrease = (ImageButton) getActivity().findViewById(R.id.increasewebsearch);
 			myBtnDecrease = (ImageButton) getActivity().findViewById(R.id.decreasewebsearch);
 			myBtnClose    = (ImageButton) getActivity().findViewById(R.id.close_websearch);
+			myBtnEdit     = (ImageButton) getActivity().findViewById(R.id.edit_webSearch);
 			
 			myBtnIncrease.setOnClickListener(this);
 			myBtnDecrease.setOnClickListener(this);
 			myBtnClose.setOnClickListener(this);
+			myBtnEdit.setOnClickListener(this);
 		}
 	}
 }
