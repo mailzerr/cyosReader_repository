@@ -21,13 +21,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebView.FindListener;
-import android.webkit.WebView.FindListener;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 public class WebSearchFragment extends Fragment implements OnClickListener {
 
@@ -67,7 +63,7 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 		View webSearchView = inflater.inflate(R.layout.web_search_fragment, container, false);
 		
 		if (savedInstanceState != null) // TODO
-		{// wird bei Änderung der Orientierung ausgeführt
+		{// wird ebenfalls bei der Änderung der Orientierung ausgeführt
 			mySearchTerm = savedInstanceState.getString("mySearchTerm");
 			myUserChoice = savedInstanceState.getString("myUserChoice");
 		}
@@ -101,8 +97,8 @@ public class WebSearchFragment extends Fragment implements OnClickListener {
 			myWebView.loadUrl(searchURL + mySearchTerm);
 			return webSearchView;
 		} else {
-			// default action, should never be here
-			myWebView.loadUrl("http://www.google.com/search?q=" + mySearchTerm);
+			// default action, for external links!
+			myWebView.loadUrl(myUserChoice);
 		}
 		
 		return webSearchView;

@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -144,7 +145,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
-			
 			// get sharedPreferences
 			SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
 			String path = sharedPreferences.getString("pathToInsert", "");
@@ -233,7 +233,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-//		restoreStructureElementsFromDB();
+//		todo: laden von strukturelementen!
 		return inflater.inflate(R.layout.my_list_fragment, container, false);
 	}
 
@@ -474,7 +474,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			e.printStackTrace();
 		}
 		
-		// SHOW save path to the user:
+		// SHOW saved path to the user:
 		//DIALOG TEST
 		AlertDialog ad = new AlertDialog.Builder(getActivity()).create();
 		ad.setCancelable(false);
@@ -494,6 +494,37 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		List<String> readedStrElem = new ArrayList<String>();
 		String[] strArray;
+		
+		//prüfen, ob die ausgewählte Strukturelemente wirklich zum geöffneten Buch gehören:
+		String bookName = fbreader.Model.Book.File.getShortName().substring(0, fbreader.Model.Book.File.getShortName().length() - 5);
+		String[] allWordsFromBookName = bookName.split(" ");
+
+		boolean containsAllNeededWords = true;
+		for(String s : allWordsFromBookName){
+			if(!pathToOpen.contains(s)){
+				containsAllNeededWords = false;
+			}
+		}
+		//prüfen, ob die ausgewähle Datei Strukturelemente enthält:
+		if(!pathToOpen.contains("Strukturelemente")){
+			containsAllNeededWords = false;
+		}
+		
+		if(!containsAllNeededWords){
+			//fehlermeldung
+			AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+			alert.setTitle("Die gewählte Datei gehört zu einem anderen Buch.");
+			alert.setMessage("Wählen Sie bitte die Datei, die im Titel das gerade geöffnete Buch enthält");
+
+			alert.setNegativeButton("ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					dialog.cancel();
+				}
+			});
+			alert.show();
+			return;
+		}
+		
 		
 		//File einlesen:
 		File myFile = new File(pathToOpen);
@@ -516,14 +547,21 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		//////////////////////
 
 		List<Bookmark> importedBookmarks = SerializerUtil.deserializeBookmarkList(readedStrElem);
-		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		
+		//set the proper book id:
+		for (Bookmark b : importedBookmarks){
+			b.setBookId(fbreader.Model.Book.getId());
+			b.setBookTitle(fbreader.Model.Book.getTitle());
+		}
+		
 		
 		if(importedBookmarks.isEmpty()) {
 			Toast.makeText(getActivity(), "Sie haben nichts zu speichern", Toast.LENGTH_LONG).show();
 			return;
 		}
 		
-		if(mode.equalsIgnoreCase("overwrite")){
+		List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		if(mode.equalsIgnoreCase("overwrite")) {
 			//fbreader.eraseVisibleBookmarks();
 			SQLiteBooksDatabase DBconn = new SQLiteBooksDatabase(getActivity());
 			for(Bookmark b : bookmarks) {
@@ -531,8 +569,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				deleteStructureElement(b);
 				myAdapter = new TOCAdapter(fbreader.Model.TOCTree);
 			}
-			
-			
 			myAdapter.notifyDataSetChanged();
 		}
 
@@ -546,18 +582,18 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			b.setId(-1); // to start insert action instead update
 			mySuperDB.saveBookmark(b);
 			fbreader.getTextView().addHighlighting(new BookmarkHighlighting(fbreader.getTextView(), fbreader.Collection, b));
-			fbreader.saveImportedBookmarks(importedBookmarks);
+			fbreader.saveImportedBookmarks(importedBookmarks); // new!
 			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
 		}
 
-		// ACHTUNG: "public" zurück auf protected in der Klasse SQLiteBooksDatabase weg machen und DB zeug selber schreiben!! bessere Kapselung USW!!
-		// hier der Code von saveBookmark einfügen SQL (statement build proces
+		// ACHTUNG: "public" zurück auf protected in der Klasse SQLiteBooksDatabase weg machen und DB statements 
+		// nochmals schreiben!! bessere Kapselung USW!!
+		// hier der Code von saveBookmark einfügen SQL (statement build process)
 
 		if( !importedBookmarks.isEmpty() ){
 			for(Bookmark b : importedBookmarks){
 				saveStructureElementImproved(b, "imported"); // speichern im Strukturbereich
 				fbreader.Collection.saveBookmark(b);
-				
 			}		}		myAdapter.notifyDataSetChanged();
 	}
 	

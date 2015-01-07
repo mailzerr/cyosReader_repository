@@ -19,20 +19,14 @@
 
 package org.geometerplus.android.fbreader;
 
-import java.io.File;
-
 import org.geometerplus.android.fbreader.image.ImageViewActivity;
-import org.geometerplus.android.fbreader.network.BookDownloader;
-import org.geometerplus.android.fbreader.network.BookDownloaderService;
 import org.geometerplus.fbreader.bookmodel.FBHyperlinkType;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
-import org.geometerplus.fbreader.network.NetworkLibrary;
+import org.geometerplus.fbreader.fbreader.FBView;
 import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.image.ZLFileImage;
 import org.geometerplus.zlibrary.core.image.ZLImageData;
 import org.geometerplus.zlibrary.core.image.ZLImageManager;
-import org.geometerplus.zlibrary.core.network.QuietNetworkContext;
-import org.geometerplus.zlibrary.core.view.ZLPaintContext;
 import org.geometerplus.zlibrary.text.view.ZLTextHyperlink;
 import org.geometerplus.zlibrary.text.view.ZLTextHyperlinkRegionSoul;
 import org.geometerplus.zlibrary.text.view.ZLTextImageRegionSoul;
@@ -45,12 +39,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 
 class ProcessHyperlinkAction extends FBAndroidAction {
 	ProcessHyperlinkAction(FBReader baseActivity, FBReaderApp fbreader) {
@@ -136,32 +127,29 @@ class ProcessHyperlinkAction extends FBAndroidAction {
 	}
 
 	private void openInBrowser(final String url) {
-		final Intent intent = new Intent(Intent.ACTION_VIEW);
-		final boolean externalUrl;
-		if (BookDownloader.acceptsUri(Uri.parse(url))) {
-			intent.setClass(BaseActivity, BookDownloader.class);
-			intent.putExtra(BookDownloaderService.SHOW_NOTIFICATIONS_KEY, BookDownloaderService.Notifications.ALL);
-			externalUrl = false;
-		} else {
-			externalUrl = true;
+		
+		final FBView fbview = Reader.getTextView();
+		WebSearchFragment myWVFrag = new WebSearchFragment(fbview.getSelectedText(), url);
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
+		
+		FragmentManager fm = act.getFragmentManager(); // meinen einzigen FragmentManager holen
+		FragmentTransaction transaction = fm.beginTransaction();
+
+		Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag");
+//		hide strElFrag:
+		transaction.detach(StructElFrag); 
+		
+//		entferne das geöffnete Fragment bis auf den Strukturbereich:
+//		TODO: überprüfen, was passiert, wenn es mehrere Fragmente auf dem Stack sind
+		if (fm.getBackStackEntryCount() > 1)	{
+			fm.popBackStack();
 		}
-		final NetworkLibrary nLibrary = NetworkLibrary.Instance();
-		new Thread(new Runnable() {
-			public void run() {
-				if (!url.startsWith("fbreader-action:")) {
-					nLibrary.initialize(new QuietNetworkContext());
-				}
-				intent.setData(Uri.parse(nLibrary.rewriteUrl(url, externalUrl)));
-				BaseActivity.runOnUiThread(new Runnable() {
-					public void run() {
-						try {
-							OrientationUtil.startActivity(BaseActivity, intent);
-						} catch (ActivityNotFoundException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		}).start();
+	
+		transaction.add(R.id.fragment_container, myWVFrag, "websearch");
+		transaction.addToBackStack("websearch");
+		transaction.commit();
+		
+		fbview.clearSelection();
 	}
 }

@@ -116,8 +116,8 @@ mainLoop:
 	}
 
 	private long myId;
-	private final long myBookId;
-	private final String myBookTitle;
+	private long myBookId;
+	private String myBookTitle;
 	private String myText;
 	private final Date myCreationDate;
 	private Date myModificationDate;
@@ -247,6 +247,10 @@ mainLoop:
 	public long getBookId() {
 		return myBookId;
 	}
+	
+	public void setBookId(long id) {
+		myBookId = id;
+	}
 
 	public int getStyleId() {
 		return myStyleId;
@@ -262,6 +266,9 @@ mainLoop:
 
 	public String getBookTitle() {
 		return myBookTitle;
+	}
+	public void setBookTitle(String title) {
+		myBookTitle = title;
 	}
 
 	public Date getDate(DateType type) {

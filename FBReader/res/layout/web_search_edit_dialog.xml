@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:text="Suchmaschine: "
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/edit_suchmaschine"
@@ -32,15 +32,15 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/edit_suchmaschine"
-        android:textSize="14sp"
-        android:text="http://www.google.com/search?q="  />
+        android:textSize="14sp" 
+        android:text="Standardwert: http://www.google.com/search?q="  />
 
     <View
         android:id="@+id/devider1"
         android:layout_width="fill_parent"
         android:layout_height="2dip"
         android:layout_below="@+id/TextView03"
-        android:background="#FF00FF00"
+        android:background="#FF006633"
         android:paddingBottom="10dp"
         android:paddingTop="10dp" />
 
@@ -51,7 +51,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/devider1"
         android:text="Wörterbuch: "
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/edit_dictionary"
@@ -72,14 +72,13 @@
         android:textSize="14sp" />
 
         <View
-        android:id="@+id/devider2"
-        android:layout_width="fill_parent"
-        android:layout_height="2dip"
-        android:layout_below="@+id/TextView05"
-        android:background="#FF00FF00"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp" />
-    
+            android:id="@+id/devider2"
+            android:layout_width="fill_parent"
+            android:layout_height="2dip"
+            android:layout_below="@+id/TextView05"
+            android:background="#FF006633"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp" />
     
     <TextView
         android:id="@+id/TextView02"
@@ -88,7 +87,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/TextView05"
         android:text="Wikipedia: "
-        android:textSize="16sp" />
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/edit_wikipedia"

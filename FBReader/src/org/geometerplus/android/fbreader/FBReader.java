@@ -637,24 +637,6 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 		
 		PopupPanel.restoreVisibilities(myFBReaderApp);
 		ApiServerImplementation.sendEvent(this, ApiListener.EVENT_READ_MODE_OPENED);
-		//TODO
-		// TEST : get the import file path from a LibraryActivity
-		// idea from here: http://stackoverflow.com/questions/10407159/how-to-manage-start-activity-for-result-on-android
-//		Intent i = new Intent(FBReader.this, LibraryActivity.class);
-//		startActivityForResult(i, 1);
-		/*if (pathToInsert != null){
-			if(!FBReader.pathToInsert.isEmpty()){
-				StructureElementsFragment fragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
-				try {
-					fragment.importStructureElementsFromFile(FBReader.pathToInsert, "overwrite");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		*/
-		// END TEST
 	}
 
 	@Override
@@ -752,24 +734,6 @@ public final class FBReader extends Activity implements ZLApplicationWindow{
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode,resultCode,data);
 		
-//	    if (requestCode == 1) {
-//	        if(!FBReader.pathToInsert.isEmpty()) {
-////	            String path=data.getStringExtra("path");
-//	        	String path = FBReader.pathToInsert;
-//	        	FBReader.pathToInsert = "";
-//	            try {
-//					StructureElementsFragment fragment = (StructureElementsFragment) getFragmentManager().findFragmentByTag("StructureElementsFragmentTag");
-//					fragment.importStructureElementsFromFile(path, "overwrite");
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//	        }
-//	        if (resultCode == 0) {
-//	            //Write your code if there's no result
-//	        }
-//	    }
-	    
 		switch (requestCode) {
 			case REQUEST_PREFERENCES:
 				if (resultCode != RESULT_DO_NOTHING && data != null) {
