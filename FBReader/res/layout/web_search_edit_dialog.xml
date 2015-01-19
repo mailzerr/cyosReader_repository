@@ -33,7 +33,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/edit_suchmaschine"
         android:textSize="14sp" 
-        android:text="Standardwert: http://www.google.com/search?q="  />
+        android:text="Standardwert: http://www.google.com/search?q= "  />
 
     <View
         android:id="@+id/devider1"

@@ -265,8 +265,8 @@
 	<node name="editStyle">
 		<node name="name" value="Name"/>
 		<node name="invisible" value="Unsichtbar">
-			<node name="summaryOn" value="Lesezeichen nicht hervorheben"/>
-			<node name="summaryOff" value="Lesezeichen hervorheben"/>
+			<node name="summaryOn" value="Strukturelemente nicht hervorheben"/>
+			<node name="summaryOff" value="Strukturelemente hervorheben"/>
 		</node>
 		<node name="bgColor" value="Hintergrundfarbe"/>
 	</node>
@@ -275,7 +275,7 @@
 		<node name="openInDictionary" value="Im Wörterbuch nachschlagen"/>
 		<node name="quoteFrom" value="Zitat aus '%s'"/>
 		<node name="textInBuffer" value="In die Zwischenablage kopiert:&#10;%s"/>
-		<node name="bookmarkCreated" value="Lesezeichen erstellt:&#10;%s"/>
+		<node name="bookmarkCreated" value="Strukturelement erstellt:&#10;%s"/>
 		<node name="clearSelection" value="Auswahl aufheben"/>
 	</node>
 	<node name="sharing">

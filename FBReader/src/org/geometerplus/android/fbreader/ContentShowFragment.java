@@ -20,7 +20,7 @@ import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-public class ImageShowFragment extends Fragment implements OnClickListener {
+public class ContentShowFragment extends Fragment implements OnClickListener {
 
 	Bitmap myBitmap;
 	ImageView myImageView;
@@ -35,12 +35,12 @@ public class ImageShowFragment extends Fragment implements OnClickListener {
 	ImageButton myBtnDecrease;
 	ImageButton myBtnClose; 
 	
-	public ImageShowFragment(String url) {
+	public ContentShowFragment(String url) {
 		super();
 		myUrl = url;
 	}
 	
-	public ImageShowFragment(Bitmap bitmap) {
+	public ContentShowFragment(Bitmap bitmap) {
 		super();
 		myBitmap = bitmap;
 	}
@@ -63,7 +63,7 @@ public class ImageShowFragment extends Fragment implements OnClickListener {
 			Activity act = (Activity) fbreader.getMyWindow();
 			FragmentManager fm = act.getFragmentManager();
 			FragmentTransaction transaction = fm.beginTransaction();
-			Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag");
+			Fragment StructElFrag = fm.findFragmentByTag("StructureElementsFragmentTag"); 
 
 			if (fm.getBackStackEntryCount() > 1) {
 				fm.popBackStack();
@@ -204,7 +204,7 @@ public class ImageShowFragment extends Fragment implements OnClickListener {
 	@Override
 	public void onResume() {
 		super.onResume();
-		ImageShowFragment webFrag = (ImageShowFragment) getActivity().getFragmentManager().findFragmentByTag("ImageFragmentTag"); 
+		ContentShowFragment webFrag = (ContentShowFragment) getActivity().getFragmentManager().findFragmentByTag("ImageFragmentTag"); 
 		if(webFrag != null){
 			myBtnIncrease = (ImageButton) getActivity().findViewById(R.id.increaseshowimage);
 			myBtnDecrease = (ImageButton) getActivity().findViewById(R.id.decreaseshowimage);

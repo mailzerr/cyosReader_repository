@@ -84,13 +84,13 @@ class ProcessHyperlinkAction extends FBAndroidAction {
 					intent.setClass(BaseActivity, ImageViewActivity.class);
 					intent.setData(Uri.parse(url));
 //					new stuff
-//					ImageShowFragment myImgFragment = new ImageShowFragment("file:///sdcard/epub/testbuch/imgname.png"); //funktioniert
+//					ContentShowFragment myImgFragment = new ContentShowFragment("file:///sdcard/epub/testbuch/imgname.png"); //funktioniert
 					final Uri uri = Uri.parse(url);
 					final ZLFileImage image = ZLFileImage.byUrlPath(uri.getPath());
 					final ZLImageData imageData = ZLImageManager.Instance().getImageData(image);
 					Bitmap myBitmap = ((ZLAndroidImageData)imageData).getFullSizeBitmap();
 
-					ImageShowFragment myImgFragment = new ImageShowFragment(myBitmap);
+					ContentShowFragment myImgFragment = new ContentShowFragment(myBitmap);
 					
 					FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 					Activity act = (Activity) fbreader.getMyWindow(); 

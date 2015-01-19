@@ -114,25 +114,11 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		return;
 	}
 
-	/////////////////////////////////////////////////////
-//___________________EVTL. WICHTIGE VERBESSERUNGEN___________________
-	// Im Modus ohne Kapitelüberschriften muss beim Longklick ein Contextmenu angezeigt werden, in dem nach dem Elternelement gefragt wird. 
-	// Beispiel: ich möchte alle Zitate unter einen Hut bringen und setze als Elternelement einen bestimmten Knoten.
 
 	// GUTE IDEE: Im Strukturbereich die Kommentare zum Strukturelement
 	// anbringen: als Kind dem TOC-Objekt des Strukturelements 
 	// hinzufügen! evtl. ein Bild auch..
 	// und das Padding auf der gleichen Ebene wie das Strukturelement	
-////////////////////////////////////////////////////
-//	___________________EVTL. WICHTIGE CODESCHNIPSEL:___________________
-	
-//    frag.getFragmentManager().saveFragmentInstanceState(f); WICHTIG FÜR ERSETZEN DER FRAGMENTE
-	
-	
-//	 myAdapter.IGNORE_ITEM_VIEW_TYPE //das passt vielleicht dazu, die
-//	 Inhaltsverzeichniselemente auszublenden.
-
-	
 //	evtl. interessante Funktionen:
 //	TOCTree toInsert = treeToSelect.getTreeByParagraphNumber(b.getParagraphIndex());
 //	TOCTree structElDoppelt = new TOCTree(null);
@@ -153,7 +139,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString("pathToInsert", "");
 			editor.putString("choice", "");
-			
 			editor.commit();
 			
 			if(!path.isEmpty()){
@@ -164,7 +149,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					e.printStackTrace();
 				}
 			}
-			
 			// end shared Preferences
 			
 			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
@@ -195,6 +179,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 						myFragment.saveStructureElementImproved(b, "old_bookmarks");
 //						myAdapter.notifyDataSetChanged();
 					}
+					myAdapter.notifyDataSetChanged();
 				}
 			}
 		}
@@ -281,8 +266,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			
 			// Anzeigetext abkürzen
 			String textToShow = "";
-			if (tree.getText().length() > 30) {
-				textToShow = tree.getText().substring(0, 30) + "..";
+			if (tree.getText().length() > 50) {
+				textToShow = tree.getText().substring(0, 50) + "..";
 			} else {
 				textToShow = tree.getText();
 			}
@@ -334,6 +319,12 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 				}
 				// start anim with Value Animator:
 				ValueAnimator anim = ValueAnimator.ofInt(newWidth, newWidth + layoutChangeValue);
+				//Adds a listener to the set of listeners that are sent update events through the 
+				//life of an animation. This method is called on all listeners for every frame of
+				//the animation, after the values for the animation have been calculated.
+
+
+
 				anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 					@Override
 					// onAnimationUpdate informiert über das Auftreten eines anderen Frames in Animation
@@ -433,7 +424,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 	}
 
-	
 	public void exportStructureElementsToFile() throws IOException {
 		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		
@@ -606,7 +596,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if(fbreader.Model != null) {
 			TOCTree root = fbreader.Model.TOCTree; // Level 0
 			
-			//find right toctree to insert the bookmark b:
+			//find right toctree 
 			for (int i = 0; i < root.subtrees().size(); i++) { // für alle
 																// (Kapitel)
 				if (root.subtrees().get(i).subtrees().size() > 0) {
