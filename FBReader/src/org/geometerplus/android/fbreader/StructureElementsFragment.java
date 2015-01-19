@@ -110,7 +110,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			}
 		}
 //		//informiere den Adapter über die Änderungen
-//		myAdapter.notifyDataSetChanged();
+		myAdapter.notifyDataSetChanged();
 		return;
 	}
 
@@ -232,6 +232,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			super(getListView(), root);
 		}
 
+		
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
 		
@@ -572,7 +573,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			b.setId(-1); // to start insert action instead update
 			mySuperDB.saveBookmark(b);
 			fbreader.getTextView().addHighlighting(new BookmarkHighlighting(fbreader.getTextView(), fbreader.Collection, b));
-			fbreader.saveImportedBookmarks(importedBookmarks); // new!
+	//		fbreader.saveImportedBookmarks(importedBookmarks); // new!
 			fbreader.setBookmarkHighlightings(fbreader.getTextView(), null);
 		}
 
@@ -582,8 +583,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 
 		if( !importedBookmarks.isEmpty() ){
 			for(Bookmark b : importedBookmarks){
-				saveStructureElementImproved(b, "imported"); // speichern im Strukturbereich
-				fbreader.Collection.saveBookmark(b);
+		//		saveStructureElementImproved(b, "imported"); // speichern im Strukturbereich
+	//			fbreader.Collection.saveBookmark(b);
 			}		}		myAdapter.notifyDataSetChanged();
 	}
 	
