@@ -45,6 +45,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class StructureElementsFragment extends ListFragment implements AdapterView.OnItemClickListener, OnClickListener {
@@ -69,6 +70,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		TOCTree treeToSelect = null;
 		if(fbreader.Model != null){
 			TOCTree root = fbreader.Model.TOCTree;
+			
 			//find right toctree to insert the bookmark b:
 			for (int i = 0; i < root.subtrees().size(); i++) {
 				if(b.getParagraphIndex() > root.subtrees().get(i).getReference().ParagraphIndex) {
@@ -185,7 +187,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					myAdapter.notifyDataSetChanged();
 				}
 			}
-			getListView().invalidateViews();
+			obnovka();
+//			getListView().invalidateViews();
 		}
 	}
 	
@@ -620,5 +623,61 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 		myAdapter.notifyDataSetChanged();
 	}
-	
+	 public void obnovka() {
+		 final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		 TOCTree root = fbreader.Model.TOCTree;
+		 myAdapter = new TOCAdapter(root);
+		 
+		 for (int i = 0; i < root.subtrees().size(); i++) {
+			 root.subtrees().get(i).clear(); //alle Strukturelemente löschen
+		 }
+		 //jedes einzelne Bookmark einfügen
+		 List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
+		for (Bookmark b : bookmarks) {
+			// TADAA
+			TOCTree treeToSelect = null;
+			if (root != null) {
+				// find right toctree to insert the bookmark b:
+				for (int i = 0; i < root.subtrees().size(); i++) {
+					if (b.getParagraphIndex() > root.subtrees().get(i).getReference().ParagraphIndex) {
+						// richtiges Kapitel zum Einfügen gefunden:
+						treeToSelect = root.subtrees().get(i);
+					}
+				}
+			}
+			// nun muss man die Einfügeposition im subtree des richtigen Kapitels finden... "gemäß dem Textverlauf"
+			List<TOCTree> subtrees = treeToSelect.subtrees();
+			// Wenn subtree leer ist: als erstes Element einfügen
+			if (subtrees.isEmpty()) {
+				TOCTree toc = new TOCTree(treeToSelect);
+				toc.setText(b.getText());
+				if (toc.getReference() == null) {
+					toc.setReference(null, b.ParagraphIndex);
+				}
+			} else { // sonst solange t.getReference().ParagraphIndex <
+						// b.getParagraphIndex()
+				for (int i = 0; i < subtrees.size(); i++) {
+					if (subtrees.get(i).getReference().ParagraphIndex < b
+							.getParagraphIndex()) {
+						if (i != subtrees.size() - 1) {
+							continue;
+						} else {
+							i++;
+						}
+					}
+					// richtige Einfügeposition gefunden: einfügen
+					TOCTree toc = new TOCTree(treeToSelect, i); 
+					toc.setText(b.getText());
+					if (toc.getReference() == null) {
+						toc.setReference(null, b.ParagraphIndex);
+					}
+					break;
+				}
+			}
+			// TADAA
+		}
+		getListView().invalidateViews();
+		myAdapter.notifyDataSetChanged();
+		
+	 }
 }
