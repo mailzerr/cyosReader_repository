@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -155,6 +156,8 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			final TOCTree root = fbreader.Model.TOCTree;
 			myAdapter = new TOCAdapter(root);   // TODO nicht zurücksetzen!
 			
+			
+			
 			TOCTree treeToSelect = fbreader.getCurrentTOCElement();
 			myAdapter.selectItem(treeToSelect);
 			mySelectedItem = treeToSelect;
@@ -182,6 +185,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					myAdapter.notifyDataSetChanged();
 				}
 			}
+			getListView().invalidateViews();
 		}
 	}
 	
