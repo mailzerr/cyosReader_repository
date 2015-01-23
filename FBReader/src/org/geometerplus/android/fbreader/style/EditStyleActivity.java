@@ -59,7 +59,7 @@ public class EditStyleActivity extends PreferenceActivity {
 					return;
 				}
 				screen.addPreference(new NamePreference());
-				screen.addPreference(new InvisiblePreference());
+				//screen.addPreference(new InvisiblePreference());
 				myBgColorPreference = new BgColorPreference();
 				screen.addPreference(myBgColorPreference);
 			}
