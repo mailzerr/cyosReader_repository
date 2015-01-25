@@ -37,7 +37,7 @@ public abstract class MenuData {
 			ourNodes.add(new MenuNode.Item(ActionCode.SHOW_LIBRARY, R.drawable.ic_menu_library));
 			ourNodes.add(new MenuNode.Item(ActionCode.SHOW_NETWORK_LIBRARY, R.drawable.ic_menu_networklibrary));
 //			ourNodes.add(new MenuNode.Item(ActionCode.SHOW_TOC, R.drawable.ic_menu_toc));
-			ourNodes.add(new MenuNode.Item(ActionCode.SHOW_BOOKMARKS, R.drawable.ic_menu_bookmarks));
+//			ourNodes.add(new MenuNode.Item(ActionCode.SHOW_BOOKMARKS, R.drawable.ic_menu_bookmarks));
 			ourNodes.add(new MenuNode.Item(ActionCode.IMPORT_STRUCTURE_ELEMENTS, R.drawable.ic_action_import));
 			ourNodes.add(new MenuNode.Item(ActionCode.EXPORT_STRUCTURE_ELEMENTS, R.drawable.ic_action_export));
 			ourNodes.add(new MenuNode.Item(ActionCode.SWITCH_TO_NIGHT_PROFILE, R.drawable.ic_menu_night));

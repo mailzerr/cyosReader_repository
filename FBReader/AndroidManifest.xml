@@ -9,7 +9,7 @@
 	<uses-sdk
 			android:minSdkVersion="13"
 			android:maxSdkVersion="18"
-			android:targetSdkVersion="17"
+			android:targetSdkVersion="17" 
 	/>
 	<supports-screens android:xlargeScreens="true" android:anyDensity="true"/>
 	<uses-permission android:name="android.permission.INTERNET"/>

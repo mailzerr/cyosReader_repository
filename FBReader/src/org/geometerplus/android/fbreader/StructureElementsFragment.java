@@ -156,6 +156,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
+			obnovka();
 			// get sharedPreferences
 			SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
 			String path = sharedPreferences.getString("pathToInsert", "");
@@ -295,7 +296,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			setIcon(ViewUtil.findImageView(view, R.id.toc_tree_item_icon), tree);
 			
 			// Anzeigetext abkürzen
-			String textToShow = "";
+			String textToShow = ""; 
 			if (tree.getText().length() > 50) {
 				textToShow = tree.getText().substring(0, 50) + "..";
 			} else {
@@ -656,7 +657,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		 final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 		 TOCTree root = fbreader.Model.TOCTree;
 		 myAdapter = new TOCAdapter(root);
-		 
 		 for (int i = 0; i < root.subtrees().size(); i++) {
 			 root.subtrees().get(i).clear(); //alle Strukturelemente löschen
 		 }
@@ -703,7 +703,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					break;
 				}
 			}
-			// TADAA
 		}
 		getListView().invalidateViews();
 		myAdapter.notifyDataSetChanged();
