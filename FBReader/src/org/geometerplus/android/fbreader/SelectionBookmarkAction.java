@@ -54,6 +54,11 @@ public class SelectionBookmarkAction extends FBAndroidAction {
 		if (params.length != 0) {
 			existingBookmark = true;
 			bookmark = (Bookmark)params[0];
+			final Intent intent = new Intent(BaseActivity.getApplicationContext(), StyleListActivity.class);
+			FBReaderIntents.putBookmarkExtra(intent, bookmark);
+			intent.putExtra(StyleListActivity.EXISTING_BOOKMARK_KEY, existingBookmark);
+			OrientationUtil.startActivity(BaseActivity, intent);
+
 		} else {
 			existingBookmark = false;
 			//show dialog in activity:
@@ -131,12 +136,7 @@ public class SelectionBookmarkAction extends FBAndroidAction {
 					.replace("%s", bookmark.getText())
 			);*/
 		}
-//				final Intent intent = new Intent(BaseActivity.getApplicationContext(), StyleListActivity.class);
-//				FBReaderIntents.putBookmarkExtra(intent, bookmark);
-//				intent.putExtra(StyleListActivity.EXISTING_BOOKMARK_KEY, existingBookmark);
-//				OrientationUtil.startActivity(BaseActivity, intent);
 	}
 	
-		////////////////////////////////////////////////////////////////////////////////////////
 	
 }
