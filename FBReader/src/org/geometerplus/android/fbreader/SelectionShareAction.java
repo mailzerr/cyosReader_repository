@@ -19,10 +19,22 @@
 
 package org.geometerplus.android.fbreader;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 
+import org.geometerplus.zlibrary.core.application.ZLApplication;
 import org.geometerplus.zlibrary.core.resources.ZLResource;
-
+import org.geometerplus.zlibrary.ui.android.R;
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
 
 public class SelectionShareAction extends FBAndroidAction {
@@ -42,6 +54,54 @@ public class SelectionShareAction extends FBAndroidAction {
 			ZLResource.resource("selection").getResource("quoteFrom").getValue().replace("%s", title)
 		);
 		intent.putExtra(android.content.Intent.EXTRA_TEXT, text);
-		BaseActivity.startActivity(Intent.createChooser(intent, null));
+		
+		//*/*/*/*/*/*/*/*/
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow();
+		AlertDialog.Builder alert = new AlertDialog.Builder(act);//.getApplicationContext()); // !!
+		alert.setTitle("Geben Sie bitte ein Stichwort für Ihre Auswahl ein:");
+		LayoutInflater inflater = act.getLayoutInflater();
+		RelativeLayout relLayout = (RelativeLayout) act.findViewById(R.id.root_view);
+		final View dialogLayout = inflater.inflate(R.layout.fragment_edit_name, relLayout, false);
+		alert.setView(dialogLayout);
+		
+		alert.setPositiveButton("Speichern",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						// Speichern in SharedPreferences
+						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+						Activity act = (Activity) fbreader.getMyWindow();
+						SharedPreferences sharedPreferences = act.getSharedPreferences("myHeading", Context.MODE_MULTI_PROCESS);
+						final EditText heading = (EditText) dialogLayout.findViewById(R.id.edit_heading);
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						editor.putString("myHeading", heading.getText().toString());
+						editor.commit();
+						dialog.cancel();
+					}
+				});
+		
+		alert.setNegativeButton("Ausgewählten Text direkt übernehmen",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						//myHeading leeren
+						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+						Activity act = (Activity) fbreader.getMyWindow();
+						SharedPreferences sharedPreferences = act.getSharedPreferences("myHeading", Context.MODE_MULTI_PROCESS);
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						editor.putString("myHeading", "");
+						editor.commit();
+						dialog.cancel();
+					}
+		});
+		WindowManager.LayoutParams wmlp = act.getWindow().getAttributes();
+		wmlp.gravity = Gravity.BOTTOM;
+		wmlp.x = 50; // x position
+		wmlp.y = 50; // y position
+		
+		alert.show().getWindow().setLayout(500, 500);
+		
+		//*/*/*/*/*/*/*/*/
+		
+		//BaseActivity.startActivity(Intent.createChooser(intent, null));
 	}
 }

@@ -295,8 +295,17 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 
 			setIcon(ViewUtil.findImageView(view, R.id.toc_tree_item_icon), tree);
 			
+			//NEW
+//			final BookCollectionShadow myCollection = new BookCollectionShadow();
+//			final List<HighlightingStyle> styles = myCollection.highlightingStyles();
+//			HighlightingStyle style = myCollection.getHighlightingStyle(1);
+//			if(style != null){
+//				String styleName = style.getName();
+//			}
+			
+			//END NEW
 			// Anzeigetext abkürzen
-			String textToShow = ""; 
+			String textToShow = "";
 			if (tree.getText().length() > 50) {
 				textToShow = tree.getText().substring(0, 50) + "..";
 			} else {
@@ -663,7 +672,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		 //jedes einzelne Bookmark einfügen
 		 List<Bookmark> bookmarks = fbreader.getVisibleBookmarks();
 		for (Bookmark b : bookmarks) {
-			// TADAA
 			TOCTree treeToSelect = null;
 			if (root != null) {
 				// find right toctree to insert the bookmark b:

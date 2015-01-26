@@ -22,9 +22,22 @@ package org.geometerplus.android.fbreader;
 import java.util.ArrayList;
 
 import org.geometerplus.fbreader.fbreader.FBReaderApp;
+import org.geometerplus.zlibrary.core.application.ZLApplication;
+import org.geometerplus.zlibrary.ui.android.R;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.ZoomButton;
 
 abstract class ButtonsPopupPanel extends PopupPanel implements View.OnClickListener {
@@ -62,6 +75,30 @@ abstract class ButtonsPopupPanel extends PopupPanel implements View.OnClickListe
 
 	public void onClick(View view) {
 		final ActionButton button = (ActionButton)view;
+		
+		//TESTTESTTESTTESTTESTTESTTEST
+		/*
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow();
+		act.runOnUiThread(new Runnable() {
+        public void run() {
+			final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+			Activity act = (Activity) fbreader.getMyWindow();
+			AlertDialog ad = new AlertDialog.Builder(act).create();
+			ad.setCancelable(false);
+			ad.setTitle("Exportieren erfolgreich abgeschlossen");
+			ad.setMessage("Sie finden die exportierten Strukturelemente in der cyosReader Bibliothek.\n" + "Dateiname: " + "hallo");
+			ad.setButton("Schlieﬂen", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+			dialog.dismiss();
+			}
+			});
+			ad.show();
+               }
+           });
+           */
+		//TESTTESTTESTTESTTESTTESTTEST
+		
 		Application.runAction(button.ActionId);
 		if (button.IsCloseButton) {
 			storePosition();

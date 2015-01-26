@@ -59,8 +59,11 @@ import org.geometerplus.zlibrary.text.view.ZLTextView;
 import org.geometerplus.zlibrary.text.view.ZLTextWordCursor;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
+import android.widget.EditText;
 
 public final class FBReaderApp extends ZLApplication {
 	public interface ExternalFileOpener {
@@ -260,9 +263,36 @@ public final class FBReaderApp extends ZLApplication {
 		FootnoteView.clearCaches();
 	}
 	
-	public Bookmark addSelectionBookmark() {
+	public Bookmark addSelectionBookmark(String heading) {
 		final FBView fbView = getTextView();
-		final String text = fbView.getSelectedText();
+		String text = fbView.getSelectedText();
+		/*
+		final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		Activity act = (Activity) fbreader.getMyWindow();
+		  act.runOnUiThread(new Runnable() {
+             public void run() {
+				final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+				Activity act = (Activity) fbreader.getMyWindow();
+				AlertDialog ad = new AlertDialog.Builder(act).create();
+				ad.setCancelable(false);
+				ad.setTitle("Exportieren erfolgreich abgeschlossen");
+				ad.setMessage("Sie finden die exportierten Strukturelemente in der cyosReader Bibliothek.\n"
+				+ "Dateiname: " + "hallo");
+				ad.setButton("Schließen", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+				}
+				});
+				ad.show();
+                    }
+                });
+		*/
+		//////////	
+		if(heading.length() > 0) {
+			text = heading;
+		}
+		//////////
+		
 		final Bookmark bookmark = new Bookmark(
 			Model.Book,
 			fbView.getModel().getId(),
@@ -277,6 +307,8 @@ public final class FBReaderApp extends ZLApplication {
 		return bookmark;
 	}
 
+
+	
 	public List<Bookmark> getVisibleBookmarks(){
 		for (BookmarkQuery query = new BookmarkQuery(Model.Book, 30); ; query = query.next()) {
 			 List<Bookmark> myBookmarks = Collection.bookmarks(query);

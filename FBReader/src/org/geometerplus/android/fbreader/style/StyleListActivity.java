@@ -198,13 +198,33 @@ public class StyleListActivity extends ListActivity implements IBookCollection.L
 					if (style != null) {
 						myBookmark.setStyleId(style.Id);
 						myCollection.saveBookmark(myBookmark); 
-
+						
 						// TODO Stelle um die Daten zum Fragment zu schicken!!
 						// zuerst soll ich einen Zugriff auf meine Activity bekommen:
 						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 						Activity act = (Activity) fbreader.getMyWindow(); //Mein ERfolg!!! Wichtig für Interface-basierte Kommunikation mit dem Fragment
 						FragmentManager fm = act.getFragmentManager();
 						StructureElementsFragment myFragment = (StructureElementsFragment) fm.findFragmentByTag("StructureElementsFragmentTag");
+						
+						
+						/////////////////
+//						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+//						Activity act = (Activity) fbreader.getMyWindow();
+//						AlertDialog ad = new AlertDialog.Builder(act).create();
+//						ad.setCancelable(false);
+//						ad.setTitle("Exportieren erfolgreich abgeschlossen");
+//						ad.setMessage("Sie finden die exportierten Strukturelemente in der cyosReader Bibliothek.\n"
+//						+ "Dateiname: " + "hallo");
+//						ad.setButton("Schließen", new DialogInterface.OnClickListener() {
+//						public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//						}
+//						});
+//						ad.show();
+						////////////////
+						
+						
+						
 						if(myFragment != null){
 							
 /*							///////////////////////////////
