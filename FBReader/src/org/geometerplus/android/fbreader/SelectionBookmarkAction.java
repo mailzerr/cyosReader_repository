@@ -66,13 +66,13 @@ public class SelectionBookmarkAction extends FBAndroidAction {
 			final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
 			Activity act = (Activity) fbreader.getMyWindow();
 			AlertDialog.Builder alert = new AlertDialog.Builder(act);//.getApplicationContext()); // !!
-			alert.setTitle("Geben Sie bitte ein Stichwort für Ihre Auswahl ein:");
+			alert.setTitle("Hier können Sie ein Stichwort für Ihre Auswahl angeben:");
 			LayoutInflater inflater = act.getLayoutInflater();
 			RelativeLayout relLayout = (RelativeLayout) act.findViewById(R.id.root_view);
 			final View dialogLayout = inflater.inflate(R.layout.fragment_edit_name, relLayout, false);
 			alert.setView(dialogLayout);
 			
-			alert.setPositiveButton("Speichern",
+			alert.setPositiveButton("Stichwort übernehmen",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
@@ -94,7 +94,7 @@ public class SelectionBookmarkAction extends FBAndroidAction {
 					}
 				});
 			
-			alert.setNegativeButton("Text direkt übernehmen",
+			alert.setNegativeButton("Textstelle übernehmen",
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							final Bookmark bookmark;

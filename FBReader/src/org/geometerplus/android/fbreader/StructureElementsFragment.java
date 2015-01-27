@@ -156,7 +156,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		if (fbreader.Model == null) {
 			fbreader.reloadBook();
 		} else {
-			obnovka();
+			refreshStructureArea();
 			// get sharedPreferences
 			SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyPath", Context.MODE_MULTI_PROCESS);
 			String path = sharedPreferences.getString("pathToInsert", "");
@@ -210,7 +210,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 					myAdapter.notifyDataSetChanged();
 				}
 			}
-			obnovka();
+			refreshStructureArea();
 //			getListView().invalidateViews();
 		}
 	}
@@ -226,6 +226,7 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			// Beim Recreate wird die Activity nochmals erstellt und Model mit Daten befüllt.
 			return;
 		}
+		refreshStructureArea();
 	}
 
 	private static final int PROCESS_TREE_ITEM_ID = 0;
@@ -248,10 +249,14 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-//		todo: laden von strukturelementen!
 		return inflater.inflate(R.layout.my_list_fragment, container, false);
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		refreshStructureArea();
+	}
 	@Override
 	public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 	}
@@ -262,7 +267,6 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 			super(getListView(), root);
 		}
 
-		
 		@Override
 		public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
 		
@@ -662,9 +666,13 @@ public class StructureElementsFragment extends ListFragment implements AdapterVi
 		}
 		myAdapter.notifyDataSetChanged();
 	}
-	 public void obnovka() {
+	 public void refreshStructureArea() {
 		 final FBReaderApp fbreader = (FBReaderApp) ZLApplication.Instance();
+		 if(fbreader.Model == null){
+			 return;
+		 }
 		 TOCTree root = fbreader.Model.TOCTree;
+		 
 		 myAdapter = new TOCAdapter(root);
 		 for (int i = 0; i < root.subtrees().size(); i++) {
 			 root.subtrees().get(i).clear(); //alle Strukturelemente löschen
